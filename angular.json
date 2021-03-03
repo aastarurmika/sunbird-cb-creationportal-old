@@ -20,7 +20,13 @@
             "assets": [
               "src/favicon.ico",
               "src/favicon.png",
-              "src/cbp-assets"
+              "src/cbp-assets",
+              "src/assets",
+              {
+                "glob": "**/*",
+                "input": "./node_modules/@project-sunbird/sunbird-question-editor/lib/assets/",
+                "output": "/assets/"
+              }
             ],
             "stylePreprocessorOptions": {
               "includePaths": [
