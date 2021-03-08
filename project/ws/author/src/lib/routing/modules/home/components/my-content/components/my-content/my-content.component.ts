@@ -23,12 +23,13 @@ import { LoaderService } from '@ws/author/src/lib/services/loader.service'
 import { Subscription } from 'rxjs'
 import { MyContentService } from '../../services/my-content.service'
 import { map } from 'rxjs/operators'
-import { ConfigurationsService, PipeDurationTransformPipe, ValueService } from '@ws-widget/utils'
+import { ConfigurationsService, ValueService } from '@ws-widget/utils'
 
 /* tslint:disable */
 import _ from 'lodash'
 import { ILeftMenu, ITable } from '@ws-widget/collection'
 import { PipeContentTypePipe } from '../../../../../../../../../../../../library/ws-widget/utils/src/lib/pipes/pipe-content-type/pipe-content-type.pipe'
+import { PipeDurationTransformPipe } from '@ws-widget/utils/lib/pipes/pipe-duration-transform/pipe-duration-transform.pipe'
 /* tslint:enable */
 
 const defaultFilter = [

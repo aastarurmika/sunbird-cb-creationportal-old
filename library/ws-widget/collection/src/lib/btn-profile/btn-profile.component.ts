@@ -1,10 +1,10 @@
 import { Component, Input, OnInit, OnDestroy, HostBinding } from '@angular/core'
 import { NsWidgetResolver, WidgetBaseComponent } from '@ws-widget/resolver'
-import { ConfigurationsService, LogoutComponent, NsPage } from '@ws-widget/utils/src/public-api'
 import { IBtnAppsConfig } from '../btn-apps/btn-apps.model'
 import { MatDialog } from '@angular/material'
 import { Subscription } from 'rxjs'
 import { ROOT_WIDGET_CONFIG } from '../collection.config'
+import { ConfigurationsService, NsPage, LogoutComponent } from '@ws-widget/utils/public-api'
 
 @Component({
   selector: 'ws-widget-btn-profile',
