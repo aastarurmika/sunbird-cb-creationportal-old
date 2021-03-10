@@ -53,6 +53,7 @@ export class ErrorResolverComponent extends WidgetBaseComponent
   }
 
   private getErrorData(data: NsError.IErrorConfig): NsError.TAllErrorConfig {
+    debugger
     switch (this.widgetData.errorType) {
       case 'accessForbidden':
         return data.accessForbidden

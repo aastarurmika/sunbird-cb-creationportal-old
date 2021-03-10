@@ -13,7 +13,8 @@ export class DepartmentResolver
 
   constructor(
     private apiService: ApiService,
-    private router: Router, private authSvc: AuthKeycloakService
+    private router: Router,
+    private authSvc: AuthKeycloakService
   ) {
   }
 

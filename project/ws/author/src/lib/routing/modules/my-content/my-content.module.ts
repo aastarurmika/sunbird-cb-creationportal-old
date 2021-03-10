@@ -13,4 +13,4 @@ import { ContentCardV2Component } from './components/content-card-v2/content-car
   imports: [CommonModule, SharedModule, MyContentRoutingModule, PipeContentRouteModule],
   providers: [MyContentService],
 })
-export class MyContentModule {}
+export class MyContentModule { }

@@ -9,7 +9,6 @@ import { DashBoardService } from './components/dashboard/dashboard.service'
 import { LeftMenuModule } from '@ws-widget/collection'
 // import { WidgetResolverModule } from '@ws-widget/resolver'
 import { WsAuthorHomeRoutingModule } from './home.routing.module'
-import { QuestionEditorLibraryModule } from './../../../../../../../../node_modules/@project-sunbird/sunbird-question-editor'
 
 @NgModule({
   declarations: [
@@ -25,7 +24,6 @@ import { QuestionEditorLibraryModule } from './../../../../../../../../node_modu
     FormsModule,
     RouterModule,
     LeftMenuModule,
-    QuestionEditorLibraryModule
   ],
   providers: [
     DashBoardService,

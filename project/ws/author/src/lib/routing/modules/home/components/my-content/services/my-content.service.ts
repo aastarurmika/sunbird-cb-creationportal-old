@@ -23,6 +23,7 @@ import { Observable } from 'rxjs'
 import { map, mergeMap } from 'rxjs/operators'
 import { IFormMeta } from '@ws/author/src/lib/interface/form'
 import { AuthInitService } from '@ws/author/src/lib/services/init.service'
+import { ApiServiceDemo } from '../../../../../../modules/shared/services/api.service-Demo'
 const PROTECTED_SLAG_V8 = '/apis/protected/v8'
 const API_END_POINTS = {
   // https://d136953gtttd92.cloudfront.net/apis/protected/v8/user/mandatoryContent/checkStatus/60840612-6d85-4fe9-8c91-649ea093ea95
@@ -33,6 +34,7 @@ export class MyContentService {
   constructor(
     private authInitService: AuthInitService,
     private apiService: ApiService,
+    private apiServiceDemo: ApiServiceDemo,
     private accessService: AccessControlService,
     private configSvc: ConfigurationsService,
   ) { }
@@ -338,7 +340,7 @@ export class MyContentService {
   }
 
   getUserCourseDetail() {
-    return this.apiService.get<any>(
+    return this.apiServiceDemo.get<any>(
       API_END_POINTS.MANDATORY_CONTENT
     )
   }

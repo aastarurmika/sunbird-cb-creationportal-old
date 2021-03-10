@@ -35,6 +35,7 @@ export class GeneralGuard implements CanActivate {
     /**
      * Test IF User is authenticated
      */
+    console.log('======> Config service, ', this.configSvc.isAuthenticated)
     if (!this.configSvc.isAuthenticated) {
       let refAppend = ''
       if (state.url) {
@@ -50,9 +51,11 @@ export class GeneralGuard implements CanActivate {
       }
 
       try {
+        console.log('=====> Is authenticated')
         Promise.resolve(this.authSvc.login('S', redirectUrl))
         return true
       } catch (e) {
+        console.log('=====>  not authenticated')
         return false
       }
     }
@@ -95,7 +98,10 @@ export class GeneralGuard implements CanActivate {
     /**
      * Test IF User has requried role to access the page
      */
+    console.log('=====> Requried Roles : ', requiredRoles)
+    console.log('=====> config Requried Roles : ', this.configSvc.userRoles)
     if (requiredRoles && requiredRoles.length && this.configSvc.userRoles) {
+      debugger
       const requiredRolePreset = requiredRoles.some(item =>
         (this.configSvc.userRoles || new Set()).has(item),
       )

@@ -12,6 +12,7 @@ export class AppInterceptorService implements HttpInterceptor {
     @Inject(LOCALE_ID) private locale: string,
   ) { }
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    console.log('##########> Request URL : ', req.url)
     const lang = [this.locale.replace('en-US', 'en')]
     if (this.configSvc.userPreference) {
       (this.configSvc.userPreference.selectedLangGroup || '')
@@ -24,7 +25,6 @@ export class AppInterceptorService implements HttpInterceptor {
           }
         })
     }
-
     if (this.configSvc.activeOrg && this.configSvc.rootOrg) {
       const modifiedReq = req.clone({
         setHeaders: {
@@ -35,6 +35,7 @@ export class AppInterceptorService implements HttpInterceptor {
           hostPath: this.configSvc.hostPath,
         },
       })
+      console.log('============> ', modifiedReq)
       return next.handle(modifiedReq)
     }
     return next.handle(req)
