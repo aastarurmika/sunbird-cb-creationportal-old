@@ -23,7 +23,6 @@ import { LoaderService } from '@ws/author/src/lib/services/loader.service'
 import { Subscription } from 'rxjs'
 
 import { map } from 'rxjs/operators'
-import { PipeDurationTransformPipe, ValueService } from '@ws-widget/utils'
 
 /* tslint:disable */
 import _ from 'lodash'
@@ -32,6 +31,7 @@ import { MyContentService } from '../../services/my-content.service'
 import { LocalDataService } from '../../../content-detail/services/local-data.service'
 import { MyTocService } from '../../../content-detail/services/my-toc.service'
 import { environment } from '../../../../../../../../../../../../src/environments/environment'
+import { ValueService, PipeDurationTransformPipe } from '../../../../../../../../../../../../library/ws-widget/utils/src/public-api'
 // import { NsAppToc } from '../../interface/app-toc.model'
 /* tslint:enable */
 
