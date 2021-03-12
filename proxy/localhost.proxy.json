@@ -61,5 +61,59 @@
     "pathRewrite": {
       "/apis": ""
     }
+  },
+  "/action/questionset/v1/*": {
+    "target": "https://igot-sunbird.idc.tarento.com",
+    "secure": false,
+    "logLevel": "debug",
+    "changeOrigin": true,
+    "pathRewrite": {
+      "/action/questionset/v1/": "/apis/proxies/v8/action/questionset/v1/"
+    }
+  },
+  "/action/question/v1/*": {
+    "target": "https://igot-sunbird.idc.tarento.com",
+    "secure": false,
+    "logLevel": "debug",
+    "changeOrigin": true,
+    "pathRewrite": {
+      "/action/question/v1/": "/proxies/v8/action/question/v1/"
+    }
+  },
+  "/action/object/category/definition/v1/*": {
+    "target": "https://igot-sunbird.idc.tarento.com",
+    "secure": false,
+    "logLevel": "debug",
+    "changeOrigin": true,
+    "pathRewrite": {
+      "/action/object/category/definition/v1/": "/proxies/v8/action/object/category/definition/v1/"
+    }
+  },
+  "/api/*": {
+    "target": "https://igot-sunbird.idc.tarento.com",
+    "secure": false,
+    "logLevel": "debug",
+    "changeOrigin": true,
+    "pathRewrite": {
+      "/api/": "/proxies/v8/api/"
+    }
+  },
+  "/latex/*": {
+    "target": "https://igot-sunbird.idc.tarento.com",
+    "secure": false,
+    "logLevel": "debug",
+    "changeOrigin": true,
+    "pathRewrite": {
+      "/latex/": "/proxies/v8/latex/"
+    }
+  },
+  "/action/*": {
+    "target": "https://igot-sunbird.idc.tarento.com",
+    "secure": false,
+    "logLevel": "debug",
+    "changeOrigin": true,
+    "pathRewrite": {
+      "/action/": "/proxies/v8/action/"
+    }
   }
 }

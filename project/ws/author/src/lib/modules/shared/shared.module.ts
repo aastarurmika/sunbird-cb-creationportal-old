@@ -60,7 +60,6 @@ import { ShowHideToolTipDirective } from './directives/show-hide-tool-tip.direct
 import { StatusTrackComponent } from './components/status-track/status-track.component'
 import { FeedbackFormComponent } from './components/feedback-form/feedback-form.component'
 import { StatusContentDisplayComponent } from './components/status-content-display/status-content-display.component'
-import { ApiServiceDemo } from './services/api.service-Demo'
 
 @NgModule({
   declarations: [
@@ -177,7 +176,6 @@ import { ApiServiceDemo } from './services/api.service-Demo'
   ],
   providers: [
     ApiService,
-    ApiServiceDemo,
     AccessControlService,
     ConditionCheckService,
     WorkFlowService,
