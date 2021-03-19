@@ -85,26 +85,26 @@ export class MyContentComponent implements OnInit, OnDestroy {
       user: {
         id: 'bf020396-0d7b-436f-ae9f-869c6780fc45',
         name: 'Vaibahv Bhuva',
-        orgIds: ['01307938306521497658'],
+        orgIds: ['0131397178949058560'],
       },
       identifier: 'do_113232468426096640111',
       authToken: ' ',
       sid: 'iYO2K6dOSdA0rwq7NeT1TDzS-dbqduvV',
       did: '7e85b4967aebd6704ba1f604f20056b6',
       uid: 'bf020396-0d7b-436f-ae9f-869c6780fc45',
-      channel: '01307938306521497658',
+      channel: '0131397178949058560',
       pdata: {
         id: 'dev.dock.portal',
         ver: '2.8.0',
         pid: 'creation-portal',
       },
       contextRollup: {
-        l1: '01307938306521497658',
+        l1: '0131397178949058560',
       },
-      tags: ['01307938306521497658'],
+      tags: ['0131397178949058560'],
       cdata: [
         {
-          id: '01307938306521497658',
+          id: '0131397178949058560',
           type: 'sourcing_organization',
         },
         {
@@ -146,7 +146,7 @@ export class MyContentComponent implements OnInit, OnDestroy {
         lastName: 'Bhuva',
       },
       env: 'questionSetLibrary',
-      framework: 'ekstep_ncert_k-12',
+      framework: 'igot',
       cloudStorageUrls: ['https://s3.ap-south-1.amazonaws.com/ekstep-public-qa/', 'https://ekstep-public-qa.s3-ap-south-1.amazonaws.com/',
         'https://dockstorage.blob.core.windows.net/sunbird-content-dock/'],
       board: 'CBSE',
@@ -213,19 +213,36 @@ export class MyContentComponent implements OnInit, OnDestroy {
       },
     },
     config: {
-      mode: 'edit', // edit / review / read
-      maxDepth: 0,
+      mode: 'edit', // edit / review / read / sourcingReview
+      maxDepth: 2,
       objectType: 'QuestionSet',
       primaryCategory: 'Practice Question Set',
       isRoot: true,
       iconClass: 'fa fa-book',
-      children: {
-        Question: [
-          'Multiple Choice Question',
-          'Subjective Question',
-        ],
+      children: {},
+      hierarchy: {
+        level1: {
+          name: 'Section',
+          type: 'Unit',
+          mimeType: 'application/vnd.sunbird.questionset',
+          primaryCategory: 'Practice Question Set',
+          iconClass: 'fa fa-folder-o',
+          children: {},
+        },
+        level2: {
+          name: 'Sub Section',
+          type: 'Unit',
+          mimeType: 'application/vnd.sunbird.questionset',
+          primaryCategory: 'Practice Question Set',
+          iconClass: 'fa fa-folder-o',
+          children: {
+            Question: [
+              'Multiple Choice Question',
+              'Subjective Question',
+            ],
+          },
+        },
       },
-      hierarchy: {},
     },
   }
   showEditor = true

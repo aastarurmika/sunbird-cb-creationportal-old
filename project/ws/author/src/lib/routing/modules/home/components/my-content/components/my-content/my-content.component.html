@@ -1,5 +1,7 @@
-<lib-editor *ngIf="showEditor" [editorConfig]="editorConfig" (editorEmitter)="editorEventListener($event)"></lib-editor>
-
+<div class="container">
+  <lib-editor *ngIf="showEditor" [editorConfig]="editorConfig" (editorEmitter)="editorEventListener($event)">
+  </lib-editor>
+</div>
 <mat-sidenav-container class="nav-container" autosize name="auth-tool-exp">
   <mat-sidenav [mode]="mode$ | async" [(opened)]="sideNavBarOpenedMain" class="border-0">
     <div class="contain">

@@ -10,7 +10,7 @@ import { PipeDurationTransformModule } from '@ws-widget/utils'
 import { WidgetResolverModule } from '@ws-widget/resolver'
 import { AllContentComponent } from './components/all-content/all-content.component'
 import { MandatoryContentComponent } from './components/mandatory-content/mandatory-content.component'
-import { QuestionEditorLibraryModule } from '@project-sunbird/sunbird-question-editor'
+import { CollectionEditorLibraryModule } from '@project-sunbird/sunbird-collection-editor'
 
 @NgModule({
   declarations: [MyContentComponent, AllContentComponent, MandatoryContentComponent],
@@ -25,7 +25,7 @@ import { QuestionEditorLibraryModule } from '@project-sunbird/sunbird-question-e
     CardTableModule,
     WidgetResolverModule,
     AtGlanceModule,
-    QuestionEditorLibraryModule,
+    CollectionEditorLibraryModule,
   ],
   providers: [MyContentService],
 })
