@@ -136,9 +136,31 @@ export class HtmlComponent implements OnInit, OnChanges, OnDestroy {
           3000,
         )
       }
-      this.iframeUrl = this.domSanitizer.bypassSecurityTrustResourceUrl(
-        `${this.htmlContent.artifactUrl}?timestamp='${new Date().getTime()}`
-      )
+
+      // this.iframeUrl = this.domSanitizer.bypassSecurityTrustResourceUrl(
+      //   `${this.htmlContent.artifactUrl}?timestamp='${new Date().getTime()}`
+      // )
+
+      if (this.htmlContent.mimeType !== 'text/x-url') {
+        let url = ''
+
+        // if (this.htmlContent.streamingUrl) {
+        //   this.htmlContent.streamingUrl = this.htmlContent.streamingUrl.split('//').join('//cbp.')
+        //   url = `${this.htmlContent.streamingUrl}?timestamp='${new Date().getTime()}`
+        // } else {
+        //   // tslint:disable-next-line: max-line-length
+        //   url = `${environment.azureHost}/${environment.azureBucket}/content/html/
+        //   ${this.htmlContent.identifier}-snapshot/index.html?timestamp='${new Date().getTime()}`
+        // }
+
+        if (this.htmlContent.streamingUrl) {
+          url = `${this.htmlContent.streamingUrl}?timestamp='${new Date().getTime()}`
+        }
+        this.iframeUrl = this.domSanitizer.bypassSecurityTrustResourceUrl(url)
+      } else {
+        this.iframeUrl = this.domSanitizer.bypassSecurityTrustResourceUrl(this.htmlContent.artifactUrl)
+      }
+
       // testing purpose only
       // setTimeout(
       //   () => {
@@ -190,7 +212,7 @@ export class HtmlComponent implements OnInit, OnChanges, OnDestroy {
         const width = window.outerWidth
         const height = window.outerHeight
         const isWindowOpen = window.open(
-          this.htmlContent.artifactUrl,
+          this.htmlContent.streamingUrl,
           '_blank',
           `toolbar=yes,
              scrollbars=yes,
