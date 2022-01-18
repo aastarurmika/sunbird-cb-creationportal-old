@@ -1,6 +1,6 @@
 
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core'
-import { ConfigurationsService } from '@ws-widget/utils/src/public-api'
+import { ConfigurationsService, NsPage } from '@ws-widget/utils/src/public-api'
 import { SafeUrl, DomSanitizer } from '@angular/platform-browser'
 import { HeaderServiceService } from './../../../../../../../../../../../../../src/app/services/header-service.service'
 import { IActionButtonConfig, IActionButton } from '@ws/author/src/lib/interface/action-button'
@@ -15,6 +15,7 @@ import { CollectionStoreService } from '../../services/store.service'
 export class CourseHeaderComponent implements OnInit {
   appIcon: SafeUrl | null = null
   courseNameHeader: any
+  primaryNavbarBackground: Partial<NsPage.INavBackground> | null = null
   @Input() buttonConfig: IActionButtonConfig | null = null
   @Output() action = new EventEmitter<string>()
   @Output() subAction = new EventEmitter<{ type: string; identifier: string; nodeClicked?: boolean }>()
@@ -24,16 +25,17 @@ export class CourseHeaderComponent implements OnInit {
   constructor(private configSvc: ConfigurationsService, private domSanitizer: DomSanitizer,
               private headerService: HeaderServiceService,
               private store: CollectionStoreService) {
-                this.headerService.showCourseHeader.subscribe(data => {
-                  this.courseNameHeader = data
-                })
-   }
+    this.headerService.showCourseHeader.subscribe(data => {
+      this.courseNameHeader = data
+    })
+  }
 
   ngOnInit() {
     if (this.configSvc.instanceConfig) {
-       this.domSanitizer.bypassSecurityTrustResourceUrl(
-        this.appIcon = this.configSvc.instanceConfig.logos.app,
+      this.appIcon = this.domSanitizer.bypassSecurityTrustResourceUrl(
+        this.configSvc.instanceConfig.logos.app,
       )
+      this.primaryNavbarBackground = this.configSvc.primaryNavBar
     }
 
     if (this.buttonConfig) {
@@ -45,6 +47,6 @@ export class CourseHeaderComponent implements OnInit {
     }
   }
   showCourseSettings() {
-   this.subAction.emit({ type: 'editContent', identifier: this.store.parentNode[0], nodeClicked: true })
+    this.subAction.emit({ type: 'editContent', identifier: this.store.parentNode[0], nodeClicked: true })
   }
 }

@@ -77,6 +77,8 @@ export class FileUploadComponent implements OnInit, OnChanges {
   filetype!: string | null
   acceptType!: string | '.mp3,.mp4,.pdf,.zip,.m4v'
 
+  @Input() isCreatorEnable = true
+
   constructor(
     private formBuilder: FormBuilder,
     private snackBar: MatSnackBar,
@@ -815,11 +817,11 @@ export class FileUploadComponent implements OnInit, OnChanges {
     zip.createReader(new zip.BlobReader(this.file as File), (reader: zip.ZipReader) => {
       reader.getEntries((entry: zip.Entry[]) => {
         entry.forEach(element => {
-          if (element.filename.match(/[^A-Za-z0-9_.\-\/]/g)) {
-            this.errorFileList.push(element.filename)
-          } else if (!element.directory) {
-            this.fileList.push(element.filename)
-          }
+          // if (element.filename.match(/[^A-Za-z0-9_.\-\/]/g)) {
+          //   this.errorFileList.push(element.filename)
+          // } else if (!element.directory) {
+          this.fileList.push(element.filename)
+          // }
         })
         this.processAndShowResult()
       })

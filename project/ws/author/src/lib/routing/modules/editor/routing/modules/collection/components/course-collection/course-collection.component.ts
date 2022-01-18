@@ -85,6 +85,7 @@ export class CourseCollectionComponent implements OnInit, OnDestroy {
   triggerQuizSave = false
   triggerUploadSave = false
   courseId = ''
+  checkCreator = false
 
   constructor(
     private contentService: EditorContentService,
@@ -134,6 +135,7 @@ export class CourseCollectionComponent implements OnInit, OnDestroy {
         this.contentService.checkConditionV2(
           this.contentService.getOriginalMeta(this.currentParentId),
           action.conditions,
+          action.title
         )
       ) {
         actionButton.push({
@@ -322,7 +324,6 @@ export class CourseCollectionComponent implements OnInit, OnDestroy {
       }
       this.showAddchapter = false
       this.loaderService.changeLoad.next(false)
-
       this.subAction({ type: 'editContent', identifier: this.editorService.newCreatedLexid, nodeClicked: false })
       this.createTopicForm.reset()
       this.save()
@@ -342,8 +343,10 @@ export class CourseCollectionComponent implements OnInit, OnDestroy {
         // TODO  console.log('viewmode', this.viewMode)
         this.triggerUploadSave = true
       }
+
     if (
-      Object.keys(updatedContent).length ||
+      (Object.keys(updatedContent).length &&
+        (Object.values(updatedContent).length && JSON.stringify(Object.values(updatedContent)[0]) !== '{}')) ||
       Object.keys(this.storeService.changedHierarchy).length
     ) {
       this.isChanged = true
@@ -453,17 +456,19 @@ export class CourseCollectionComponent implements OnInit, OnDestroy {
 
   takeAction(contentAction?: string) {
     this.isSubmitPressed = true
-    const needSave = Object.keys(this.contentService.upDatedContent || {}).length
-    // console.log('Neddsave ', needSave)
-    if (!needSave && !this.isChanged) {
-      this.snackBar.openFromComponent(NotificationComponent, {
-        data: {
-          type: Notify.UP_TO_DATE,
-        },
-        duration: NOTIFICATION_TIME * 1000,
-      })
-      return
-    }
+    // const needSave = Object.keys(this.contentService.upDatedContent || {}).length
+
+    // if (!needSave && !this.isChanged) {
+    //   // if (!this.isChanged) {
+    //   this.snackBar.openFromComponent(NotificationComponent, {
+    //     data: {
+    //       type: Notify.UP_TO_DATE,
+    //     },
+    //     duration: NOTIFICATION_TIME * 1000,
+    //   })
+    //   return
+    // }
+
 
     // console.log('this.validationCheck', this.validationCheck)
 
@@ -2224,7 +2229,6 @@ export class CourseCollectionComponent implements OnInit, OnDestroy {
   }
 
   subAction(event: { type: string; identifier: string, nodeClicked?: boolean }) {
-
     // const nodeClicked = event.nodeClicked
     this.contentService.changeActiveCont.next(event.identifier)
     switch (event.type) {
@@ -2237,6 +2241,12 @@ export class CourseCollectionComponent implements OnInit, OnDestroy {
         }
 
         const content = this.contentService.getUpdatedMeta(event.identifier)
+
+        const isCreator = (this._configurationsService.userProfile
+          && this._configurationsService.userProfile.userId === content.createdBy)
+          ? true : false
+        this.checkCreator = isCreator
+
         // if (['application/pdf', 'application/x-mpegURL'].includes(content.mimeType)) {
         //   this.viewMode = 'upload'
         // } else if (['video/x-youtube', 'application/html'].includes(content.mimeType) && content.fileType === 'link') {
