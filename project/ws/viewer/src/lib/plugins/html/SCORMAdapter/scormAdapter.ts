@@ -163,7 +163,7 @@ export class SCORMAdapterService {
     if (this.configSvc.userProfile) {
       userId = this.configSvc.userProfile.userId || ''
     }
-    const req: NsContent.IContinueLearningDataReq = {
+    const req: any = {
       request: {
         userId,
         batchId: this.activatedRoute.snapshot.queryParamMap.get('batchId') || '',
@@ -249,7 +249,7 @@ export class SCORMAdapterService {
               batchId: this.activatedRoute.snapshot.queryParamMap.get('batchId') || '',
               courseId: this.activatedRoute.snapshot.queryParams.collectionId || '',
               status: this.getStatus(postData) || 2,
-              lastAccessTime: dayjs(new Date()).format('YYYY-MM-DD HH:mm:ss:SSSZZ'),
+              lastAccessTime: dayjs.default(new Date()).format('YYYY-MM-DD HH:mm:ss:SSSZZ'),
               progressdetails: postData
             },
           ],
