@@ -341,12 +341,18 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private set content(contentMeta: NSContent.IContentMeta) {
 
+    const isCreator = (this.configSvc.userProfile && this.configSvc.userProfile.userId === contentMeta.createdBy)
+      ? true : false
+
     this.contentMeta = contentMeta
-    this.isEditEnabled = this.contentService.hasAccess(
+    const isEditable = this.contentService.hasAccess(
       contentMeta,
       false,
       this.parentContent ? this.contentService.getUpdatedMeta(this.parentContent) : undefined,
     )
+
+    this.isEditEnabled = isEditable
+
     this.contentMeta.name = contentMeta.name === 'Untitled Content' ? '' : contentMeta.name
 
     if (this.contentMeta.creatorContacts && typeof this.contentMeta.creatorContacts === 'string') {
@@ -369,10 +375,15 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
           ? <any>this.convertToISODate(contentMeta.expiryDate)
           : ''
     }
+
     this.assignFields()
     this.setDuration(contentMeta.duration || '0')
+
+    this.isEditEnabled = isCreator && isEditable
+
     this.filterOrdinals()
     this.changeResourceType()
+
   }
 
   filterOrdinals() {
@@ -556,7 +567,6 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
   storeData() {
     try {
       const originalMeta = this.contentService.getOriginalMeta(this.contentMeta.identifier)
-
       if (originalMeta && this.isEditEnabled) {
         const expiryDate = this.contentForm.value.expiryDate
         const currentMeta: NSContent.IContentMeta = JSON.parse(JSON.stringify(this.contentForm.value))
@@ -628,7 +638,7 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
         }
         Object.keys(currentMeta).map(v => {
           if (
-            v !== 'versionKey' &&
+            v !== 'versionKey' && v !== 'visibility' &&
             JSON.stringify(currentMeta[v as keyof NSContent.IContentMeta]) !==
             JSON.stringify(originalMeta[v as keyof NSContent.IContentMeta]) && v !== 'jobProfile'
           ) {
@@ -651,7 +661,25 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
             }
           } else if (v === 'versionKey') {
             meta[v as keyof NSContent.IContentMeta] = originalMeta[v as keyof NSContent.IContentMeta]
+          } else if (v === 'visibility') {
+            // if (currentMeta['contentType'] === 'CourseUnit' && currentMeta[v] !== 'Parent') {
+            //   // console.log('%c COURSE UNIT ', 'color: #f5ec3d', meta[v],  currentMeta[v])
+            //   meta[v as keyof NSContent.IContentMeta] = 'Default'
+            // }
           }
+
+          // else if(v === 'visibility') {
+          //   console.log('VISIBILITY ', currentMeta['contentType'])
+          //   if(currentMeta['contentType'] === 'Resource' && originalMeta['depth'] === 2 && currentMeta[v] !== 'Parent') {
+          //     console.log('%c RESOURCE DEPTH 2 ', 'color: #d9388b', meta[v], currentMeta[v])
+          //       meta[v as keyof NSContent.IContentMeta] = 'Parent'
+          //   } else if(currentMeta['contentType'] === 'Resource' && originalMeta['depth'] === 1) {
+          //     console.log('%c RESOURCE DEPTH 1 ', 'color: #38d9c9')
+          //   } else if(currentMeta['contentType'] === 'CourseUnit' && currentMeta[v] !== 'Parent') {
+          //     console.log('%c COURSE UNIT ', 'color: #f5ec3d', meta[v],  currentMeta[v])
+          //       meta[v as keyof NSContent.IContentMeta] = 'Parent'
+          //   }
+          // }
         })
 
         if (this.stage >= 1 && !this.type) {
@@ -1440,7 +1468,7 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
       verifiers: [],
       visibility: [],
       instructions: [],
-      versionKey: (new Date()).getTime(),  // (new Date()).getTime()
+      versionKey: '',  // (new Date()).getTime()
       purpose: '',
     })
 

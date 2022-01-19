@@ -100,11 +100,15 @@ export class EditorService {
           framework: environment.framework,
           mimeType: meta.mimeType,
           name: meta.name,
-          organisation: [environment.organisation],
+          // organisation: [environment.organisation],
+          organisation: [
+            (this.configSvc.userProfile && this.configSvc.userProfile.departmentName) ? this.configSvc.userProfile.departmentName : '',
+          ],
           isExternal: meta.mimeType === 'application/html',
           primaryCategory: meta.primaryCategory,
           license: 'CC BY 4.0',
           ownershipType: ['createdFor'],
+          purpose: (meta.purpose) ? meta.purpose : '',
         },
       },
     }

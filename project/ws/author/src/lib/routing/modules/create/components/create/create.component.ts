@@ -30,6 +30,7 @@ export class CreateComponent implements OnInit, OnDestroy {
   panelOpenState = false
   allowReview = false
   allowAuthor = false
+  allowAuthorContentCreate = false
   allowRedo = false
   allowPublish = false
   allowExpiry = false
@@ -70,6 +71,7 @@ export class CreateComponent implements OnInit, OnDestroy {
     this.language = this.accessControlSvc.locale
 
     this.allowAuthor = this.canShow('author')
+    this.allowAuthorContentCreate = this.canShow('author_create')
     this.allowRedo = this.accessControlSvc.authoringConfig.allowRedo
     this.allowRestore = this.accessControlSvc.authoringConfig.allowRestore
     this.allowExpiry = this.accessControlSvc.authoringConfig.allowExpiry
@@ -84,6 +86,9 @@ export class CreateComponent implements OnInit, OnDestroy {
       case 'publish':
         return this.accessControlSvc.hasRole(PUBLISH_ROLE)
       case 'author':
+        return this.accessControlSvc.hasRole(CREATE_ROLE) || this.accessControlSvc.hasRole(REVIEW_ROLE)
+          || this.accessControlSvc.hasRole(PUBLISH_ROLE)
+      case 'author_create':
         return this.accessControlSvc.hasRole(CREATE_ROLE)
       default:
         return false
@@ -147,11 +152,13 @@ export class CreateComponent implements OnInit, OnDestroy {
   createCourseClicked() {
     this.loaderService.changeLoad.next(true)
     const _name = this.createCourseForm.get('name')
-    if (this.content && _name && _name.value) {
+    const _purpose = this.createCourseForm.get('purpose')
+    if (this.content && _name && _name.value && _purpose && _purpose.value) {
 
       this.svc
         .createV2({
           name: _name.value,
+          purpose: _purpose.value,
           contentType: this.content.contentType,
           mimeType: this.content.mimeType,
           locale: this.language,
