@@ -106,6 +106,7 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
   complexityLevelList: string[] = []
   isEditEnabled = false
   public sideNavBarOpened = false
+  gatingEnabled!: FormGroup
 
   @ViewChild('creatorContactsView', { static: false }) creatorContactsView!: ElementRef
   @ViewChild('trackContactsView', { static: false }) trackContactsView!: ElementRef
@@ -160,7 +161,6 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
     this.editorsCtrl = new FormControl()
     this.creatorDetailsCtrl = new FormControl()
     this.keywordsCtrl = new FormControl('')
-
     this.audienceCtrl = new FormControl()
     this.jobProfileCtrl = new FormControl()
     this.regionCtrl = new FormControl()
@@ -340,6 +340,7 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private set content(contentMeta: NSContent.IContentMeta) {
+    // console.log(contentMeta)
 
     const isCreator = (this.configSvc.userProfile && this.configSvc.userProfile.userId === contentMeta.createdBy)
       ? true : false
@@ -467,6 +468,8 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
               new Date(new Date().setMonth(new Date().getMonth() + 60)),
             )
           } else {
+            // console.log(this.contentForm.controls)
+            // console.log(this.contentMeta)
             this.contentForm.controls[v].setValue(
               JSON.parse(
                 JSON.stringify(
@@ -479,6 +482,7 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
             )
           }
         }
+        this.contentForm.controls.sourceName.setValue(this.contentMeta.sourceName)
         if (this.isSubmitPressed) {
           this.contentForm.controls[v].markAsDirty()
           this.contentForm.controls[v].markAsTouched()
@@ -615,6 +619,7 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
             }
 
             if (!currentMeta.sourceName) {
+              // console.log(currentMeta)
               currentMeta.sourceName = parentData.sourceName !== '' ? parentData.sourceName : currentMeta.sourceName
             }
           }
@@ -710,6 +715,7 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
   // }
 
   updateContentService(meta: string, value: any, event = false) {
+    // console.log(value)
     this.contentForm.controls[meta].setValue(value, { events: event })
     this.contentService.setUpdatedMeta({ [meta]: value } as any, this.contentMeta.identifier)
   }
@@ -1432,6 +1438,7 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
       locale: [],
       mimeType: [],
       name: [],
+      gatingEnabled: true,
       nodeType: [],
       org: [],
       creatorDetails: [],

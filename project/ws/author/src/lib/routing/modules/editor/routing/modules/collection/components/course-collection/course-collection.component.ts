@@ -115,6 +115,15 @@ export class CourseCollectionComponent implements OnInit, OnDestroy {
         this.save()
       }
     })
+        this.initService.currentMessage.subscribe(
+      (data: any) => {
+        // console.log(data)
+        if (data === 'publishResources') {
+          //debugger
+          this.takeAction('publishResources')
+          //this.ngOnInit()
+        }
+      })
   }
 
   ngOnInit() {
@@ -550,6 +559,7 @@ export class CourseCollectionComponent implements OnInit, OnDestroy {
           this.contentService.setOriginalMeta(resData)
         }
       })
+      if(contentAction !== 'publishResources') {
       const dialogRef = this.dialog.open(CommentsDialogComponent, {
         width: '750px',
         height: '450px',
@@ -561,15 +571,21 @@ export class CourseCollectionComponent implements OnInit, OnDestroy {
       // })
       dialogRef.afterClosed().subscribe((d) => {
         // this.finalCall(contentAction)
+        // if(d === undefined) {
+        //   contentAction = 'rejectContent'
+        //   this.finalCall(contentAction)
+        // }
         if (this.getAction() === 'sendForReview' && d.value.action === 'reject') {
           contentAction = 'rejectContent'
           this.finalCall(contentAction)
         } else {
           this.finalCall(contentAction)
         }
-
-
       })
+      }
+      if(contentAction === 'publishResources') {
+        this.finalCall(contentAction)
+      }
     }
 
 
@@ -866,7 +882,7 @@ export class CourseCollectionComponent implements OnInit, OnDestroy {
     const moduleListToReview: any = []
     const updatedMeta = this.contentService.getUpdatedMeta(this.currentParentId)
     const originalData = this.contentService.getOriginalMeta(this.contentService.parentContent)
-    if (contentActionTaken === 'acceptConent') {
+    if (contentActionTaken === 'acceptConent' || contentActionTaken === 'publishResources') {
       if (originalData && originalData.children && originalData.children.length > 0) {
         for (const element of originalData.children) {
           if (element.contentType === 'CourseUnit' || element.contentType === 'Collection') {
@@ -974,7 +990,16 @@ export class CourseCollectionComponent implements OnInit, OnDestroy {
         if (element.status === 'Live' && element.parentStatus === 'Review') {
           flag += 1
         } else if (element.reviewerStatus === 'Reviewed' && element.status === 'Review') {
-          const publishRes = await this.editorService.publishContent(element.identifier).toPromise().catch(_error => { })
+          const publishRes = await this.editorService.publishContent(element.identifier).toPromise().catch(_error => { 
+            console.log(_error.statusText)
+                 this.dialog.closeAll();
+             this.snackBar.open(_error.statusText, undefined, { duration: 1000 })
+          //             this.snackBar.openFromComponent(NotificationComponent, {
+          //   data:  _error.statusText,
+            
+          //   duration: NOTIFICATION_TIME * 1000,
+          // })
+          })
           if (publishRes && publishRes.params && publishRes.params.status === 'successful') {
             flag += 1
           } else {
@@ -982,10 +1007,26 @@ export class CourseCollectionComponent implements OnInit, OnDestroy {
           }
         }
       }
+      // console.log(flag)
+      // console.log(resourceList)
       if (flag === resourceList.length) {
+        //requestPayload.request.content.versionKey = metaData.versionKey
+        const tempRequset: NSApiRequest.IContentUpdateV3 = {
+          request: {
+            data: {
+              nodesModified: {},
+              hierarchy: this.storeService.getTreeHierarchy(),
+            },
+          },
+        }
+        const updateHierarchyRes = await this.editorService.updateHierarchyForReviwer(tempRequset).toPromise().catch(_error => { })
+        //console.log(updateHierarchyRes)
+        if (updateHierarchyRes && updateHierarchyRes.params && updateHierarchyRes.params.status === 'successful') {
         const publishParentRes = await this.editorService.publishContent(metaData.identifier).toPromise().catch(_error => { })
+
         if (publishParentRes && publishParentRes.params && publishParentRes.params.status === 'successful') {
           this.loaderService.changeLoad.next(false)
+            this.dialog.closeAll();
           this.snackBar.openFromComponent(NotificationComponent, {
             data: {
               type: Notify.SAVE_SUCCESS,
@@ -1014,7 +1055,7 @@ export class CourseCollectionComponent implements OnInit, OnDestroy {
       }
     }
   }
-
+}
   async reviewerApproved(metaData: NSContent.IContentMeta, resourceList: any) {
     this.loaderService.changeLoad.next(true)
     let flag = 0

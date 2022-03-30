@@ -329,6 +329,7 @@ export class EditorService {
   // }
 
   sendToReview(id: string, parentStatus: string) {
+    // console.log(parentStatus)
     if (parentStatus === 'Draft') {
       const requestbody = {}
       return this.apiService.post<any>(SEND_TO_REVIEW + id, requestbody)

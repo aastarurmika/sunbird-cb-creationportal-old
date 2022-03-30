@@ -53,7 +53,9 @@
     " [queryParamsHandling]="data.contentType === 'Knowledge Board' ? 'preserve' : ''">
       <!-- <img class="" role="link" [src]="data.appIcon | relativeUrl" (error)="changeToDefaultImg($event)"
         [alt]="data.name" /> -->
-      <img class="" role="link" [src]="data.appIcon" (error)="changeToDefaultImg($event)" [alt]="data.name" />
+      <!-- <img class="" role="link" [src]="data.appIcon" (error)="changeToDefaultImg($event)" [alt]="data.name" /> -->
+      <img class="" role="link" [src]="accessService.defaultLogo" [alt]="data.name" />
+      
     </a>
   </div>
   <div class="item2">
