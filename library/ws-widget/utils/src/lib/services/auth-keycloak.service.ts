@@ -1,4 +1,4 @@
-// import { HttpClient } from '@angular/common/http'
+import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { KeycloakEvent, KeycloakEventType, KeycloakInitOptions, KeycloakService } from 'keycloak-angular'
 import { fromEvent, ReplaySubject } from 'rxjs'
@@ -22,7 +22,7 @@ const storageKey = 'kc'
 export class AuthKeycloakService {
   private loginChangeSubject = new ReplaySubject<boolean>(1)
   constructor(
-    // private http: HttpClient,
+    private http: HttpClient,
     private configSvc: ConfigurationsService,
     private keycloakSvc: KeycloakService,
     private msAuthSvc: AuthMicrosoftService,
@@ -153,6 +153,7 @@ export class AuthKeycloakService {
     if (storage.getItem('telemetrySessionId')) {
       storage.removeItem('telemetrySessionId')
     }
+    await this.http.get('/apis/reset').toPromise()
     window.location.href = `${redirectUrl}apis/reset`
   }
 

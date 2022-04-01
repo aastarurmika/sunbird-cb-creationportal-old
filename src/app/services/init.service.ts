@@ -114,7 +114,10 @@ export class InitService {
     // }
     // Invalid User
     try {
-      await this.fetchStartUpDetails() // detail: depends only on userID
+      const result = await this.fetchStartUpDetails() // detail: depends only on userID
+      if (result.status === 419) {
+        this.authSvc.logout()
+      }
     } catch (e) {
       this.settingsSvc.initializePrefChanges(environment.production)
       this.updateNavConfig()
@@ -406,9 +409,10 @@ export class InitService {
         return details
       } catch (e) {
         this.configSvc.userProfile = null
+           return e
         throw new Error('Invalid user')
       }
-    } else {
+    }
       return { group: [], profileDetailsStatus: true, roles: new Set(['Public']), tncStatus: true, isActive: true }
       // const details: IDetailsResponse = await this.http
       //   .get<IDetailsResponse>(endpoint.details).pipe(retry(3))
@@ -417,7 +421,7 @@ export class InitService {
       // this.configSvc.userRoles = new Set((details.roles || []).map(v => v.toLowerCase()))
       // if (this.configSvc.userProfile && this.configSvc.userProfile.isManager) {
       //   this.configSvc.userRoles.add('is_manager')
-    }
+
   }
 
   // private async fetchUserProfileV2(): Promise<any> {

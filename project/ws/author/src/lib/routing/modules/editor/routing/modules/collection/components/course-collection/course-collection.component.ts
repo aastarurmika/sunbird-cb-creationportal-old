@@ -115,13 +115,14 @@ export class CourseCollectionComponent implements OnInit, OnDestroy {
         this.save()
       }
     })
-        this.initService.currentMessage.subscribe(
+    this.initService.currentMessage.subscribe(
       (data: any) => {
         // console.log(data)
         if (data === 'publishResources') {
-          //debugger
           this.takeAction('publishResources')
-          //this.ngOnInit()
+        }
+        if (data === 'PublishCBP') {
+          this.PublishCBP()
         }
       })
   }
@@ -345,57 +346,57 @@ export class CourseCollectionComponent implements OnInit, OnDestroy {
   }
 
   tempSave() {
-      //this.loaderService.changeLoad.next(true)
-      this.triggerSave().subscribe(
-        () => {
-          //this.loaderService.changeLoad.next(false)
-          this.snackBar.openFromComponent(NotificationComponent, {
+    //this.loaderService.changeLoad.next(true)
+    this.triggerSave().subscribe(
+      () => {
+        //this.loaderService.changeLoad.next(false)
+        this.snackBar.openFromComponent(NotificationComponent, {
+          data: {
+            type: Notify.SAVE_SUCCESS,
+          },
+          duration: NOTIFICATION_TIME * 1000,
+        })
+        // window.location.reload()
+      },
+      (error: any) => {
+        if (error.status === 409) {
+          const errorMap = new Map<string, NSContent.IContentMeta>()
+          Object.keys(this.contentService.originalContent).forEach(v =>
+            errorMap.set(v, this.contentService.originalContent[v]),
+          )
+          const dialog = this.dialog.open(ErrorParserComponent, {
+            width: '80vw',
+            height: '90vh',
             data: {
-              type: Notify.SAVE_SUCCESS,
+              errorFromBackendData: error.error,
+              dataMapping: errorMap,
             },
-            duration: NOTIFICATION_TIME * 1000,
           })
-          // window.location.reload()
-        },
-        (error: any) => {
-          if (error.status === 409) {
-            const errorMap = new Map<string, NSContent.IContentMeta>()
-            Object.keys(this.contentService.originalContent).forEach(v =>
-              errorMap.set(v, this.contentService.originalContent[v]),
-            )
-            const dialog = this.dialog.open(ErrorParserComponent, {
-              width: '80vw',
-              height: '90vh',
-              data: {
-                errorFromBackendData: error.error,
-                dataMapping: errorMap,
-              },
-            })
-            dialog.afterClosed().subscribe(v => {
-              if (v) {
-                if (typeof v === 'string') {
-                  this.storeService.selectedNodeChange.next(
-                    (this.storeService.lexIdMap.get(v) as number[])[0],
-                  )
-                  this.contentService.changeActiveCont.next(v)
-                } else {
-                  this.storeService.selectedNodeChange.next(v)
-                  this.contentService.changeActiveCont.next(
-                    this.storeService.uniqueIdMap.get(v) as string,
-                  )
-                }
+          dialog.afterClosed().subscribe(v => {
+            if (v) {
+              if (typeof v === 'string') {
+                this.storeService.selectedNodeChange.next(
+                  (this.storeService.lexIdMap.get(v) as number[])[0],
+                )
+                this.contentService.changeActiveCont.next(v)
+              } else {
+                this.storeService.selectedNodeChange.next(v)
+                this.contentService.changeActiveCont.next(
+                  this.storeService.uniqueIdMap.get(v) as string,
+                )
               }
-            })
-          }
-          //this.loaderService.changeLoad.next(false)
-          this.snackBar.openFromComponent(NotificationComponent, {
-            data: {
-              type: Notify.SAVE_FAIL,
-            },
-            duration: NOTIFICATION_TIME * 1000,
+            }
           })
-        },
-      )
+        }
+        //this.loaderService.changeLoad.next(false)
+        this.snackBar.openFromComponent(NotificationComponent, {
+          data: {
+            type: Notify.SAVE_FAIL,
+          },
+          duration: NOTIFICATION_TIME * 1000,
+        })
+      },
+    )
   }
 
   save(nextAction?: string) {
@@ -559,31 +560,31 @@ export class CourseCollectionComponent implements OnInit, OnDestroy {
           this.contentService.setOriginalMeta(resData)
         }
       })
-      if(contentAction !== 'publishResources') {
-      const dialogRef = this.dialog.open(CommentsDialogComponent, {
-        width: '750px',
-        height: '450px',
-        data: this.contentService.getOriginalMeta(this.currentParentId),
-      })
+      if (contentAction !== 'publishResources') {
+        const dialogRef = this.dialog.open(CommentsDialogComponent, {
+          width: '750px',
+          height: '450px',
+          data: this.contentService.getOriginalMeta(this.currentParentId),
+        })
 
-      // dialogRef.afterClosed().subscribe((commentsForm: FormGroup) => {
-      //   this.finalCall(commentsForm)
-      // })
-      dialogRef.afterClosed().subscribe((d) => {
-        // this.finalCall(contentAction)
-        // if(d === undefined) {
-        //   contentAction = 'rejectContent'
-        //   this.finalCall(contentAction)
-        // }
-        if (this.getAction() === 'sendForReview' && d.value.action === 'reject') {
-          contentAction = 'rejectContent'
-          this.finalCall(contentAction)
-        } else {
-          this.finalCall(contentAction)
-        }
-      })
+        // dialogRef.afterClosed().subscribe((commentsForm: FormGroup) => {
+        //   this.finalCall(commentsForm)
+        // })
+        dialogRef.afterClosed().subscribe((d) => {
+          // this.finalCall(contentAction)
+          // if(d === undefined) {
+          //   contentAction = 'rejectContent'
+          //   this.finalCall(contentAction)
+          // }
+          if (this.getAction() === 'sendForReview' && d.value.action === 'reject') {
+            contentAction = 'rejectContent'
+            this.finalCall(contentAction)
+          } else {
+            this.finalCall(contentAction)
+          }
+        })
       }
-      if(contentAction === 'publishResources') {
+      if (contentAction === 'publishResources') {
         this.finalCall(contentAction)
       }
     }
@@ -990,15 +991,15 @@ export class CourseCollectionComponent implements OnInit, OnDestroy {
         if (element.status === 'Live' && element.parentStatus === 'Review') {
           flag += 1
         } else if (element.reviewerStatus === 'Reviewed' && element.status === 'Review') {
-          const publishRes = await this.editorService.publishContent(element.identifier).toPromise().catch(_error => { 
+          const publishRes = await this.editorService.publishContent(element.identifier).toPromise().catch(_error => {
             console.log(_error.statusText)
-                 this.dialog.closeAll();
-             this.snackBar.open(_error.statusText, undefined, { duration: 1000 })
-          //             this.snackBar.openFromComponent(NotificationComponent, {
-          //   data:  _error.statusText,
-            
-          //   duration: NOTIFICATION_TIME * 1000,
-          // })
+            this.dialog.closeAll()
+            this.snackBar.open(_error.statusText, undefined, { duration: 1000 })
+            //             this.snackBar.openFromComponent(NotificationComponent, {
+            //   data:  _error.statusText,
+
+            //   duration: NOTIFICATION_TIME * 1000,
+            // })
           })
           if (publishRes && publishRes.params && publishRes.params.status === 'successful') {
             flag += 1
@@ -1007,8 +1008,7 @@ export class CourseCollectionComponent implements OnInit, OnDestroy {
           }
         }
       }
-      // console.log(flag)
-      // console.log(resourceList)
+
       if (flag === resourceList.length) {
         //requestPayload.request.content.versionKey = metaData.versionKey
         const tempRequset: NSApiRequest.IContentUpdateV3 = {
@@ -1019,43 +1019,76 @@ export class CourseCollectionComponent implements OnInit, OnDestroy {
             },
           },
         }
-        const updateHierarchyRes = await this.editorService.updateHierarchyForReviwer(tempRequset).toPromise().catch(_error => { })
+        await this.editorService.updateHierarchyForReviwer(tempRequset).toPromise().catch(_error => { })
+        this.initService.changeMessage(metaData.identifier)
+        this.loaderService.changeLoad.next(false)
+        //const updateHierarchyRes =
         //console.log(updateHierarchyRes)
-        if (updateHierarchyRes && updateHierarchyRes.params && updateHierarchyRes.params.status === 'successful') {
-        const publishParentRes = await this.editorService.publishContent(metaData.identifier).toPromise().catch(_error => { })
+        //   if (updateHierarchyRes && updateHierarchyRes.params && updateHierarchyRes.params.status === 'successful') {
+        //   const publishParentRes = await this.editorService.publishContent(metaData.identifier).toPromise().catch(_error => { })
 
-        if (publishParentRes && publishParentRes.params && publishParentRes.params.status === 'successful') {
-          this.loaderService.changeLoad.next(false)
-            this.dialog.closeAll();
-          this.snackBar.openFromComponent(NotificationComponent, {
-            data: {
-              type: Notify.SAVE_SUCCESS,
-            },
-            duration: NOTIFICATION_TIME * 1000,
-          })
-          await this.sendEmailNotification('publishCompleted')
-          this.router.navigate(['author', 'cbp'])
-        } else {
-          this.loaderService.changeLoad.next(false)
-          this.snackBar.openFromComponent(NotificationComponent, {
-            data: {
-              type: Notify.SAVE_FAIL,
-            },
-            duration: NOTIFICATION_TIME * 1000,
-          })
-        }
+        //   if (publishParentRes && publishParentRes.params && publishParentRes.params.status === 'successful') {
+        //     this.loaderService.changeLoad.next(false)
+        //       this.dialog.closeAll();
+        //     this.snackBar.openFromComponent(NotificationComponent, {
+        //       data: {
+        //         type: Notify.SAVE_SUCCESS,
+        //       },
+        //       duration: NOTIFICATION_TIME * 1000,
+        //     })
+        //     await this.sendEmailNotification('publishCompleted')
+        //     this.router.navigate(['author', 'cbp'])
+        //   } else {
+        //     this.loaderService.changeLoad.next(false)
+        //     this.snackBar.openFromComponent(NotificationComponent, {
+        //       data: {
+        //         type: Notify.SAVE_FAIL,
+        //       },
+        //       duration: NOTIFICATION_TIME * 1000,
+        //     })
+        //   }
+        // } else {
+        //   this.loaderService.changeLoad.next(false)
+        //   this.snackBar.openFromComponent(NotificationComponent, {
+        //     data: {
+        //       type: Notify.SAVE_FAIL,
+        //     },
+        //     duration: NOTIFICATION_TIME * 1000,
+        //   })
+        // }
       } else {
         this.loaderService.changeLoad.next(false)
-        this.snackBar.openFromComponent(NotificationComponent, {
-          data: {
-            type: Notify.SAVE_FAIL,
-          },
-          duration: NOTIFICATION_TIME * 1000,
-        })
+        this.snackBar.open('The status of the resources present in the course is not correct, please retire the course and start over again', undefined, { duration: 3000 })
       }
     }
   }
-}
+  async PublishCBP() {
+    this.loaderService.changeLoad.next(true)
+    const url = this.router.url
+    const id = url.split('/')
+    const publishParentRes = await this.editorService.publishContent(id[3]).toPromise().catch(_error => { })
+    if (publishParentRes && publishParentRes.params && publishParentRes.params.status === 'successful') {
+      this.loaderService.changeLoad.next(false)
+      this.dialog.closeAll()
+      this.snackBar.openFromComponent(NotificationComponent, {
+        data: {
+          type: Notify.SAVE_SUCCESS,
+        },
+        duration: NOTIFICATION_TIME * 1000,
+      })
+      await this.sendEmailNotification('publishCompleted')
+      this.router.navigate(['author', 'cbp'])
+    } else {
+      this.loaderService.changeLoad.next(false)
+      this.snackBar.openFromComponent(NotificationComponent, {
+        data: {
+          type: Notify.SAVE_FAIL,
+        },
+        duration: NOTIFICATION_TIME * 1000,
+      })
+    }
+  }
+  
   async reviewerApproved(metaData: NSContent.IContentMeta, resourceList: any) {
     this.loaderService.changeLoad.next(true)
     let flag = 0
