@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { KeycloakEvent, KeycloakEventType, KeycloakInitOptions, KeycloakService } from 'keycloak-angular'
 import { fromEvent, ReplaySubject } from 'rxjs'
-import { filter } from 'rxjs/operators'
+import { filter, map } from 'rxjs/operators'
 import { AuthMicrosoftService } from './auth-microsoft.service'
 import { ConfigurationsService } from './configurations.service'
 
@@ -149,12 +149,21 @@ export class AuthKeycloakService {
   //   }
   // }
 
-  async logout(redirectUrl = this.defaultRedirectUrl) {
+  async logout(): Promise<any> {
     if (storage.getItem('telemetrySessionId')) {
       storage.removeItem('telemetrySessionId')
     }
-    await this.http.get('/apis/reset').toPromise()
-    window.location.href = `${redirectUrl}apis/reset`
+    try {
+     await this.http.get('/apis/reset')
+        .pipe(map((res: any) => res))
+          .toPromise()
+     } catch (error) { 
+      return error
+      // if(error.status === 0){
+
+      // }
+     }
+     //window.location.href = `${redirectUrl}apis/reset`
   }
 
   private addKeycloakEventListener() {

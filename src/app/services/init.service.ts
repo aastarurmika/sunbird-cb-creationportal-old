@@ -116,9 +116,13 @@ export class InitService {
     try {
       const result = await this.fetchStartUpDetails() // detail: depends only on userID
       if (result.status === 419) {
-        this.authSvc.logout()
+        let res = await this.authSvc.logout()
+           /* tslint:disable-next-line */
+        console.log(res)
       }
     } catch (e) {
+         /* tslint:disable-next-line */
+         console.log(e)
       this.settingsSvc.initializePrefChanges(environment.production)
       this.updateNavConfig()
       this.logger.info('Not Authenticated')
