@@ -1069,7 +1069,7 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
 
                   .subscribe(
                     data => {
-                      if (data) {
+                      if (data && data.name !== "Error") {
                         const generateURL = this.generateUrl(data.artifactUrl)
                         const updateArtf: NSApiRequest.IUpdateImageMetaRequestV2 = {
                           request: {
@@ -1105,9 +1105,12 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
                                 data: {
                                   type: Notify.UPLOAD_SUCCESS,
                                 },
-                                duration: NOTIFICATION_TIME * 1000,
+                                duration: NOTIFICATION_TIME * 2000,
                               })
                             })
+                      } else {
+                        this.loader.changeLoad.next(false)
+                        this.snackBar.open(data.message, undefined, { duration: 1000 })
                       }
                     },
                     () => {
