@@ -106,7 +106,8 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
   complexityLevelList: string[] = []
   isEditEnabled = false
   public sideNavBarOpened = false
-  gatingEnabled!: FormGroup
+  gatingEnabled!: FormControl
+  issueCertification!: FormControl
 
   @ViewChild('creatorContactsView', { static: false }) creatorContactsView!: ElementRef
   @ViewChild('trackContactsView', { static: false }) trackContactsView!: ElementRef
@@ -1442,6 +1443,7 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
       mimeType: [],
       name: [],
       gatingEnabled: true,
+      issueCertification: false,
       nodeType: [],
       org: [],
       creatorDetails: [],
