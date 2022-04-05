@@ -114,7 +114,12 @@ export class InitService {
     // }
     // Invalid User
     try {
-      await this.fetchStartUpDetails() // detail: depends only on userID
+      const result = await this.fetchStartUpDetails() // detail: depends only on userID
+      if (result.status === 419) {
+        let res = this.authSvc.logout()
+           /* tslint:disable-next-line */
+        console.log(res)
+      }
     } catch (e) {
       this.settingsSvc.initializePrefChanges(environment.production)
       this.updateNavConfig()
