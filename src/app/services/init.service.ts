@@ -114,12 +114,13 @@ export class InitService {
     // }
     // Invalid User
     try {
-      const result = await this.fetchStartUpDetails() // detail: depends only on userID
-      if (result.status === 419) {
-        let res = await this.authSvc.logout()
-           /* tslint:disable-next-line */
-        console.log(res)
-      }
+      await this.fetchStartUpDetails() // detail: depends only on userID
+       //const result =
+      // if (result.status === 419) {
+      //   let res = this.authSvc.logout()
+      //      /* tslint:disable-next-line */
+      //   console.log(res)
+      // }
     } catch (e) {
          /* tslint:disable-next-line */
          console.log(e)
@@ -416,7 +417,7 @@ export class InitService {
            return e
         throw new Error('Invalid user')
       }
-    }
+    } else {
       return { group: [], profileDetailsStatus: true, roles: new Set(['Public']), tncStatus: true, isActive: true }
       // const details: IDetailsResponse = await this.http
       //   .get<IDetailsResponse>(endpoint.details).pipe(retry(3))
@@ -427,6 +428,7 @@ export class InitService {
       //   this.configSvc.userRoles.add('is_manager')
 
   }
+}
 
   // private async fetchUserProfileV2(): Promise<any> {
   //   // const userRoles: string[] = []
