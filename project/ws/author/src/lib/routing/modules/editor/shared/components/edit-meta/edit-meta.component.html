@@ -979,7 +979,12 @@
           </div> -->
         </div>
       </div>
-
+      <div style="margin-left: 25px">
+        <mat-checkbox class="example-margin" formControlName="gatingEnabled">Gating Enabled</mat-checkbox>
+      </div>
+    <div style="margin-left: 25px">
+        <mat-checkbox class="example-margin" formControlName="issueCertification">Issue Certification</mat-checkbox>
+      </div>
       <div class="margin-top-xl ">
         <p class="mat-h5 margin-top-s margin-left-xl flex-1" *ngIf="checkCondition('contentType', 'show')">
           * Provide meta details. Depending on the content type, some properties are enabled or
@@ -1037,9 +1042,6 @@
         </div>
 
         <div class="">
-
-
-
           <div class="margin-top-xs margin-left-xl flex-1" *ngIf="checkCondition('sourceName', 'show')"
             [ngClass]="{ disable: checkCondition('sourceName', 'disabled') }">
             <label [ngClass]="{ required: true }">

@@ -2,6 +2,18 @@
   text-align: right;
 }
 
+.text-bold{
+  font-weight: bold !important;
+}
+table {
+  border: 1px solid #990000; 
+  border-collapse: collapse;
+  width: 100%;
+}
+th, td {
+    border: solid 1px lightgrey;
+    text-align: center;
+}
 .mat-dialog-content {
   overflow: hidden !important;
   max-height: none !important;

@@ -53,27 +53,28 @@ export class AppInterceptorService implements HttpInterceptor {
         },
       })
       return next.handle(modifiedReq).pipe(
-        catchError(error => {
+        catchError((error: { status: any; error: { redirectUrl: string } }) => {
           if (error instanceof HttpErrorResponse) {
+            // console.log(error)
             switch (error.status) {
               case 419:      // login
-                const localUrl = location.origin
+                // const localUrl = location.origin
                 // const pageName = '/page/home'
-                const pageName = '/author/cbp/me'
+                // const pageName = '/author/cbp/me'
                 if (localStorage.getItem('telemetrySessionId')) {
                   localStorage.removeItem('telemetrySessionId')
                 }
-                if (localUrl.includes('localhost')) {
-                  // tslint:disable-next-line: prefer-template
-                  window.location.href = error.error.redirectUrl + `?q=${localUrl}${pageName}`
-                } else {
-                  // tslint:disable-next-line: prefer-template
-                  window.location.href = error.error.redirectUrl + `?q=${pageName}`
-                }
-                break
+                // if (localUrl.includes('localhost')) {
+                //   // tslint:disable-next-line: prefer-template
+                //   window.location.href = error.error.redirectUrl + `?q=${localUrl}${pageName}`
+                // } else {
+                //   // tslint:disable-next-line: prefer-template
+                //   window.location.href = error.error.redirectUrl + `?q=${pageName}`
+                // }
+                // break
             }
           }
-          return throwError('error')
+          return throwError(error)
         })
       )
     }

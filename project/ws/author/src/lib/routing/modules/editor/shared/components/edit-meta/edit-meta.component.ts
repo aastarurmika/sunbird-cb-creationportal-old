@@ -28,7 +28,7 @@ import { NotificationComponent } from '@ws/author/src/lib/modules/shared/compone
 import { EditorContentService } from '@ws/author/src/lib/routing/modules/editor/services/editor-content.service'
 import { EditorService } from '@ws/author/src/lib/routing/modules/editor/services/editor.service'
 import { Observable, of, Subscription } from 'rxjs'
-import { InterestService } from '../../../../../../../../../app/src/lib/routes/profile/routes/interest/services/interest.service'
+// import { InterestService } from '../../../../../../../../../app/src/lib/routes/profile/routes/interest/services/interest.service'
 import { UploadService } from '../../services/upload.service'
 import { CatalogSelectComponent } from '../catalog-select/catalog-select.component'
 import { IFormMeta } from './../../../../../../interface/form'
@@ -40,7 +40,7 @@ import {
   debounceTime,
   distinctUntilChanged,
   filter,
-  startWith,
+  // startWith,
   switchMap,
   map,
 } from 'rxjs/operators'
@@ -106,6 +106,8 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
   complexityLevelList: string[] = []
   isEditEnabled = false
   public sideNavBarOpened = false
+  gatingEnabled!: FormControl
+  issueCertification!: FormControl
 
   @ViewChild('creatorContactsView', { static: false }) creatorContactsView!: ElementRef
   @ViewChild('trackContactsView', { static: false }) trackContactsView!: ElementRef
@@ -132,7 +134,7 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
     private contentService: EditorContentService,
     private configSvc: ConfigurationsService,
     private ref: ChangeDetectorRef,
-    private interestSvc: InterestService,
+    // private interestSvc: InterestService,
     private loader: LoaderService,
     private authInitService: AuthInitService,
     private accessService: AccessControlService,
@@ -160,7 +162,6 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
     this.editorsCtrl = new FormControl()
     this.creatorDetailsCtrl = new FormControl()
     this.keywordsCtrl = new FormControl('')
-
     this.audienceCtrl = new FormControl()
     this.jobProfileCtrl = new FormControl()
     this.regionCtrl = new FormControl()
@@ -310,12 +311,12 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
       this.content = this.contentService.getUpdatedMeta(data)
     })
 
-    this.filteredOptions$ = this.keywordsCtrl.valueChanges.pipe(
-      startWith(this.keywordsCtrl.value),
-      debounceTime(500),
-      distinctUntilChanged(),
-      switchMap(value => this.interestSvc.fetchAutocompleteInterestsV2(value)),
-    )
+    // this.filteredOptions$ = this.keywordsCtrl.valueChanges.pipe(
+    //   startWith(this.keywordsCtrl.value),
+    //   debounceTime(500),
+    //   distinctUntilChanged(),
+    //   switchMap(value => this.interestSvc.fetchAutocompleteInterestsV2(value)),
+    // )
   }
 
   optionSelected(keyword: string) {
@@ -340,6 +341,7 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private set content(contentMeta: NSContent.IContentMeta) {
+    // console.log(contentMeta)
 
     const isCreator = (this.configSvc.userProfile && this.configSvc.userProfile.userId === contentMeta.createdBy)
       ? true : false
@@ -467,6 +469,8 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
               new Date(new Date().setMonth(new Date().getMonth() + 60)),
             )
           } else {
+            // console.log(this.contentForm.controls)
+            // console.log(this.contentMeta)
             this.contentForm.controls[v].setValue(
               JSON.parse(
                 JSON.stringify(
@@ -479,6 +483,7 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
             )
           }
         }
+        this.contentForm.controls.sourceName.setValue(this.contentMeta.sourceName)
         if (this.isSubmitPressed) {
           this.contentForm.controls[v].markAsDirty()
           this.contentForm.controls[v].markAsTouched()
@@ -615,6 +620,7 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
             }
 
             if (!currentMeta.sourceName) {
+              // console.log(currentMeta)
               currentMeta.sourceName = parentData.sourceName !== '' ? parentData.sourceName : currentMeta.sourceName
             }
           }
@@ -710,6 +716,7 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
   // }
 
   updateContentService(meta: string, value: any, event = false) {
+    // console.log(value)
     this.contentForm.controls[meta].setValue(value, { events: event })
     this.contentService.setUpdatedMeta({ [meta]: value } as any, this.contentMeta.identifier)
   }
@@ -1063,7 +1070,7 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
 
                   .subscribe(
                     data => {
-                      if (data) {
+                      if (data && data.name !== 'Error') {
                         const generateURL = this.generateUrl(data.artifactUrl)
                         const updateArtf: NSApiRequest.IUpdateImageMetaRequestV2 = {
                           request: {
@@ -1099,9 +1106,12 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
                                 data: {
                                   type: Notify.UPLOAD_SUCCESS,
                                 },
-                                duration: NOTIFICATION_TIME * 1000,
+                                duration: NOTIFICATION_TIME * 2000,
                               })
                             })
+                      } else {
+                        this.loader.changeLoad.next(false)
+                        this.snackBar.open(data.message, undefined, { duration: 1000 })
                       }
                     },
                     () => {
@@ -1432,6 +1442,8 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
       locale: [],
       mimeType: [],
       name: [],
+      gatingEnabled: true,
+      issueCertification: false,
       nodeType: [],
       org: [],
       creatorDetails: [],

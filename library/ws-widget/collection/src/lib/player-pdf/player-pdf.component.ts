@@ -18,7 +18,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators'
 // import { ViewerUtilService } from '../../../../../../project/ws/viewer/src/lib/viewer-util.service'
 import { ROOT_WIDGET_CONFIG } from '../collection.config'
 import { NsContent } from '../_services/widget-content.model'
-import { WidgetContentService } from '../_services/widget-content.service'
+// import { WidgetContentService } from '../_services/widget-content.service'
 import { IWidgetsPlayerPdfData } from './player-pdf.model'
 
 const pdfjsViewer = require('pdfjs-dist/web/pdf_viewer')
@@ -68,7 +68,7 @@ export class PlayerPdfComponent extends WidgetBaseComponent
     private router: Router,
     private eventSvc: EventService,
     private logger: LoggerService,
-    private contentSvc: WidgetContentService,
+    // private contentSvc: WidgetContentService,
     // private viewerSvc: ViewerUtilService,
     private valueSvc: ValueService,
   ) {
@@ -191,7 +191,7 @@ export class PlayerPdfComponent extends WidgetBaseComponent
   }
   ngOnDestroy() {
     if (this.identifier) {
-      this.saveContinueLearning(this.identifier)
+      // this.saveContinueLearning(this.identifier)
       this.fireRealTimeProgress(this.identifier)
     }
     if (this.contextMenuSubs) {
@@ -227,44 +227,44 @@ export class PlayerPdfComponent extends WidgetBaseComponent
       })
     }
   }
-  saveContinueLearning(id: string) {
-    if (this.activatedRoute.snapshot.queryParams.collectionType &&
-      this.activatedRoute.snapshot.queryParams.collectionType.toLowerCase() === 'playlist') {
-      const reqBody = {
-        contextPathId: this.activatedRoute.snapshot.queryParams.collectionId
-          ? this.activatedRoute.snapshot.queryParams.collectionId
-          : id,
-        resourceId: id,
-        contextType: 'playlist',
-        dateAccessed: Date.now(),
-        data: JSON.stringify({
-          progress: this.currentPage.value,
-          timestamp: Date.now(),
-          contextFullPath: [this.activatedRoute.snapshot.queryParams.collectionId, id],
-        }),
-      }
-      this.contentSvc
-        .saveContinueLearning(reqBody)
-        .toPromise()
-        .catch()
-    } else {
-      const reqBody = {
-        contextPathId: this.activatedRoute.snapshot.queryParams.collectionId
-          ? this.activatedRoute.snapshot.queryParams.collectionId
-          : id,
-        resourceId: id,
-        dateAccessed: Date.now(),
-        data: JSON.stringify({
-          progress: this.currentPage.value,
-          timestamp: Date.now(),
-        }),
-      }
-      this.contentSvc
-        .saveContinueLearning(reqBody)
-        .toPromise()
-        .catch()
-    }
-  }
+  // saveContinueLearning(id: string) {
+  //   if (this.activatedRoute.snapshot.queryParams.collectionType &&
+  //     this.activatedRoute.snapshot.queryParams.collectionType.toLowerCase() === 'playlist') {
+  //     const reqBody = {
+  //       contextPathId: this.activatedRoute.snapshot.queryParams.collectionId
+  //         ? this.activatedRoute.snapshot.queryParams.collectionId
+  //         : id,
+  //       resourceId: id,
+  //       contextType: 'playlist',
+  //       dateAccessed: Date.now(),
+  //       data: JSON.stringify({
+  //         progress: this.currentPage.value,
+  //         timestamp: Date.now(),
+  //         contextFullPath: [this.activatedRoute.snapshot.queryParams.collectionId, id],
+  //       }),
+  //     }
+  //     this.contentSvc
+  //       .saveContinueLearning(reqBody)
+  //       .toPromise()
+  //       .catch()
+  //   } else {
+  //     const reqBody = {
+  //       contextPathId: this.activatedRoute.snapshot.queryParams.collectionId
+  //         ? this.activatedRoute.snapshot.queryParams.collectionId
+  //         : id,
+  //       resourceId: id,
+  //       dateAccessed: Date.now(),
+  //       data: JSON.stringify({
+  //         progress: this.currentPage.value,
+  //         timestamp: Date.now(),
+  //       }),
+  //     }
+  //     this.contentSvc
+  //       .saveContinueLearning(reqBody)
+  //       .toPromise()
+  //       .catch()
+  //   }
+  // }
   fireRealTimeProgress(id: string) {
     if (id && this.totalPages > 0 && this.current.length > 0) {
       // const realTimeProgressRequest = {

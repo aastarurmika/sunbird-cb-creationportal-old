@@ -97,7 +97,7 @@ export const AUTH_INIT: IInitialSetup = {
       } as any,
       additionalMeta: {
         isExternal: false,
-        isIframeSupported: 'Yes',
+        // isIframeSupported: 'Yes',
       } as any,
       children: [
         'url',
@@ -145,7 +145,7 @@ export const AUTH_INIT: IInitialSetup = {
       } as any,
       additionalMeta: {
         isExternal: false,
-        isIframeSupported: 'Yes',
+        // isIframeSupported: 'Yes',
       } as any,
       children: [] as any,
     },
@@ -186,7 +186,7 @@ export const AUTH_INIT: IInitialSetup = {
       },
       additionalMeta: {
         isExternal: false,
-        isIframeSupported: 'Yes',
+        // isIframeSupported: 'Yes',
       } as any,
       children: [] as any,
     },
@@ -227,7 +227,7 @@ export const AUTH_INIT: IInitialSetup = {
       },
       additionalMeta: {
         isExternal: false,
-        isIframeSupported: 'Yes',
+        // isIframeSupported: 'Yes',
       } as any,
       children: [] as any,
     },
@@ -267,7 +267,7 @@ export const AUTH_INIT: IInitialSetup = {
       },
       additionalMeta: {
         isExternal: true,
-        isIframeSupported: 'No',
+        // isIframeSupported: 'No',
       } as any,
       children: [] as any,
     },
@@ -307,7 +307,7 @@ export const AUTH_INIT: IInitialSetup = {
       },
       additionalMeta: {
         isExternal: false,
-        isIframeSupported: 'Yes',
+        // isIframeSupported: 'Yes',
       } as any,
       children: [] as any,
     },
@@ -347,7 +347,7 @@ export const AUTH_INIT: IInitialSetup = {
       },
       additionalMeta: {
         isExternal: false,
-        isIframeSupported: 'Yes',
+        // isIframeSupported: 'Yes',
       } as any,
       children: [] as any,
     },
@@ -390,7 +390,7 @@ export const AUTH_INIT: IInitialSetup = {
       },
       additionalMeta: {
         isExternal: false,
-        isIframeSupported: 'Yes',
+        // isIframeSupported: 'Yes',
       } as any,
     },
     {
@@ -430,7 +430,7 @@ export const AUTH_INIT: IInitialSetup = {
       },
       additionalMeta: {
         isExternal: false,
-        isIframeSupported: 'Yes',
+        // isIframeSupported: 'Yes',
       } as any,
     },
     {
@@ -472,7 +472,7 @@ export const AUTH_INIT: IInitialSetup = {
       },
       additionalMeta: {
         isExternal: false,
-        isIframeSupported: 'Yes',
+        // isIframeSupported: 'Yes',
       } as any,
     },
     {
@@ -544,7 +544,7 @@ export const AUTH_INIT: IInitialSetup = {
       } as any,
       additionalMeta: {
         isExternal: false,
-        isIframeSupported: 'Yes',
+        // isIframeSupported: 'Yes',
       } as any,
     },
     {
@@ -586,7 +586,7 @@ export const AUTH_INIT: IInitialSetup = {
       },
       additionalMeta: {
         isExternal: false,
-        isIframeSupported: 'Yes',
+        // isIframeSupported: 'Yes',
       } as any,
     },
     {
@@ -627,7 +627,7 @@ export const AUTH_INIT: IInitialSetup = {
       },
       additionalMeta: {
         isExternal: true,
-        isIframeSupported: 'No',
+        // isIframeSupported: 'No',
       } as any,
     },
   ],
@@ -2432,55 +2432,55 @@ export const AUTH_INIT: IInitialSetup = {
       } as any,
       type: 'boolean',
     },
-    isIframeSupported: {
-      mandatoryFor: {} as any,
-      notMandatoryFor: {} as any,
-      showFor: {
-        Resource: [] as any,
-        Course: [] as any,
-      } as any,
-      notDisabledFor: {} as any,
-      disabledFor: {} as any,
-      notShowFor: {} as any,
-      defaultValue: {
-        Course: [{
-          condition: {
-            contentType: ['Course'],
-          } as any,
-          value: 'Yes',
-        }],
-        Resource: [{
-          condition: {
-            contentType: ['Resource'],
-          } as any,
-          value: 'Yes',
-        } as any, {
-          condition: {
-            mimeType: ['application/html'],
-          } as any,
-          value: 'No',
-        }],
-        'Knowledge Board': [{
-          condition: {
-            contentType: ['Knowledge Board'],
-          } as any,
-          value: 'Yes',
-        }],
-        'Knowledge Artifact': [{
-          condition: {
-            contentType: ['Knowledge Artifact'],
-          } as any,
-          value: 'Yes',
-        }],
-        Channel: [{
-          condition: {
-            contentType: ['Channel'],
-          } as any,
-          value: 'Yes',
-        }],
-      } as any,
-      type: 'string',
-    },
+    // isIframeSupported: {
+    //   mandatoryFor: {} as any,
+    //   notMandatoryFor: {} as any,
+    //   showFor: {
+    //     Resource: [] as any,
+    //     Course: [] as any,
+    //   } as any,
+    //   notDisabledFor: {} as any,
+    //   disabledFor: {} as any,
+    //   notShowFor: {} as any,
+    //   defaultValue: {
+    //     Course: [{
+    //       condition: {
+    //         contentType: ['Course'],
+    //       } as any,
+    //       value: 'Yes',
+    //     }],
+    //     Resource: [{
+    //       condition: {
+    //         contentType: ['Resource'],
+    //       } as any,
+    //       value: 'Yes',
+    //     } as any, {
+    //       condition: {
+    //         mimeType: ['application/html'],
+    //       } as any,
+    //       value: 'No',
+    //     }],
+    //     'Knowledge Board': [{
+    //       condition: {
+    //         contentType: ['Knowledge Board'],
+    //       } as any,
+    //       value: 'Yes',
+    //     }],
+    //     'Knowledge Artifact': [{
+    //       condition: {
+    //         contentType: ['Knowledge Artifact'],
+    //       } as any,
+    //       value: 'Yes',
+    //     }],
+    //     Channel: [{
+    //       condition: {
+    //         contentType: ['Channel'],
+    //       } as any,
+    //       value: 'Yes',
+    //     }],
+    //   } as any,
+    //   type: 'string',
+    // },
     isInIntranet: {
       mandatoryFor: {} as any,
       notMandatoryFor: {} as any,

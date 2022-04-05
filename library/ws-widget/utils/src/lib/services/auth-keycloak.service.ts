@@ -1,4 +1,4 @@
-// import { HttpClient } from '@angular/common/http'
+ // mport { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { KeycloakEvent, KeycloakEventType, KeycloakInitOptions, KeycloakService } from 'keycloak-angular'
 import { fromEvent, ReplaySubject } from 'rxjs'
@@ -149,7 +149,7 @@ export class AuthKeycloakService {
   //   }
   // }
 
-  async logout(redirectUrl = this.defaultRedirectUrl) {
+  logout(redirectUrl = this.defaultRedirectUrl) {
     if (storage.getItem('telemetrySessionId')) {
       storage.removeItem('telemetrySessionId')
     }

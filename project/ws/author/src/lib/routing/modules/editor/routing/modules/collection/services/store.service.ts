@@ -754,6 +754,8 @@ export class CollectionStoreService {
       const errorMsg: string[] = []
       const lexId = this.uniqueIdMap.get(v) as string
       const content = this.contentService.getUpdatedMeta(lexId)
+       // console.log(content.sourceName)
+       // console.log(content.parent)
       if (content.name === '') {
          errorMsg.push('Course title cannot be empty')
       }
@@ -766,10 +768,10 @@ export class CollectionStoreService {
        if (content.instructions === '') {
         errorMsg.push('Course long description cannot be empty')
       }
-      if (content.thumbnail === '') {
-        errorMsg.push('Course thumbnail cannot be empty')
-      }
-      if (content.sourceName && content.sourceName === 'My Learning World') {
+       if (content.thumbnail === undefined || content.thumbnail === '') {
+         errorMsg.push('Course thumbnail cannot be empty')
+       }
+      if (content.sourceName === undefined && content.status === 'Draft' && content.parent !== undefined) {
         errorMsg.push('Course provider/source cannot be empty')
       }
       if (content.mimeType === 'text/x-url' && content.artifactUrl === '') {
