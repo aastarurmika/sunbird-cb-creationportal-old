@@ -7,7 +7,11 @@ import { HttpBackend, HttpClient } from '@angular/common/http'
 import { ActivatedRoute } from '@angular/router'
 import { ConfigurationsService } from '@ws-widget/utils'
 import { NsContent } from '@ws-widget/collection'
+<<<<<<< HEAD
 import * as dayjs from 'dayjs'
+=======
+import dayjs from 'dayjs'
+>>>>>>> 3a6fbe735e299497100a93aabcfda7329bf036b4
 const API_END_POINTS = {
   SCROM_ADD_UPDTE: '/apis/protected/v8/scrom/add',
   SCROM_FETCH: '/apis/protected/v8/scrom/get',
@@ -249,7 +253,11 @@ export class SCORMAdapterService {
               batchId: this.activatedRoute.snapshot.queryParamMap.get('batchId') || '',
               courseId: this.activatedRoute.snapshot.queryParams.collectionId || '',
               status: this.getStatus(postData) || 2,
+<<<<<<< HEAD
               lastAccessTime: dayjs.default(new Date()).format('YYYY-MM-DD HH:mm:ss:SSSZZ'),
+=======
+              lastAccessTime: dayjs(new Date()).format('YYYY-MM-DD HH:mm:ss:SSSZZ'),
+>>>>>>> 3a6fbe735e299497100a93aabcfda7329bf036b4
               progressdetails: postData
             },
           ],

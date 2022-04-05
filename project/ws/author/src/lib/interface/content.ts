@@ -232,6 +232,7 @@ export namespace NSContent {
     minLexVersion: string
     minOsVersion: number
     os: string[]
+    parent: any
     checksum: string
     downloadUrl: string
     artifactUrl: string
@@ -385,6 +386,7 @@ export namespace NSContent {
     prevStatus: string,
     reviewStatus: string,
     streamingUrl: string[],
+    entryPoint: string[]
   }
 
   export interface IOrganisations {

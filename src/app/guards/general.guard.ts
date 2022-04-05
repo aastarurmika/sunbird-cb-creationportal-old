@@ -88,8 +88,12 @@ export class GeneralGuard implements CanActivate {
       // ) {
       //   return this.router.parseUrl(`/app/setup/home/lang`)
       // }
+<<<<<<< HEAD
       //return this.router.parseUrl(`/app/tnc`)
       return true
+=======
+      // return this.router.parseUrl(`/app/tnc`)
+>>>>>>> 3a6fbe735e299497100a93aabcfda7329bf036b4
     }
     /**
        * Test IF User updated the profile details

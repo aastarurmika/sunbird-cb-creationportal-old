@@ -69,7 +69,7 @@ export class ViewerTocComponent implements OnInit, OnDestroy {
   resourceId: string | null = null
   collection: IViewerTocCard | null = null
   queue: IViewerTocCard[] = []
-  tocMode: 'FLAT' | 'TREE' = 'FLAT'
+  tocMode: 'FLAT' | 'TREE' = 'TREE'
   nestedTreeControl: NestedTreeControl<IViewerTocCard>
   nestedDataSource: MatTreeNestedDataSource<IViewerTocCard>
   defaultThumbnail: SafeUrl | null = null
@@ -174,10 +174,11 @@ export class ViewerTocComponent implements OnInit, OnDestroy {
     _collectionType: string,
   ): Promise<IViewerTocCard | null> {
     try {
-      const content: NsContent.IContent = await (this.forPreview
-        ? this.contentSvc.fetchAuthoringContent(collectionId)
+      let content: NsContent.IContent = await (this.forPreview
+        ? this.contentSvc.fetchAuthoringContentHierarchy(collectionId)
         : this.contentSvc.fetchContent(collectionId, 'detail')
       ).toPromise()
+      content = content.result.content
       this.collectionCard = this.createCollectionCard(content)
       const viewerTocCardContent = this.convertContentToIViewerTocCard(content)
       this.isFetching = false
