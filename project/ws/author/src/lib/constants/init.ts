@@ -97,7 +97,7 @@ export const AUTH_INIT: IInitialSetup = {
       } as any,
       additionalMeta: {
         isExternal: false,
-        //isIframeSupported: 'Yes',
+        // isIframeSupported: 'Yes',
       } as any,
       children: [
         'url',
@@ -145,7 +145,7 @@ export const AUTH_INIT: IInitialSetup = {
       } as any,
       additionalMeta: {
         isExternal: false,
-        //isIframeSupported: 'Yes',
+        // isIframeSupported: 'Yes',
       } as any,
       children: [] as any,
     },
@@ -186,7 +186,7 @@ export const AUTH_INIT: IInitialSetup = {
       },
       additionalMeta: {
         isExternal: false,
-        //isIframeSupported: 'Yes',
+        // isIframeSupported: 'Yes',
       } as any,
       children: [] as any,
     },
@@ -227,7 +227,7 @@ export const AUTH_INIT: IInitialSetup = {
       },
       additionalMeta: {
         isExternal: false,
-        //isIframeSupported: 'Yes',
+        // isIframeSupported: 'Yes',
       } as any,
       children: [] as any,
     },
@@ -267,7 +267,7 @@ export const AUTH_INIT: IInitialSetup = {
       },
       additionalMeta: {
         isExternal: true,
-        //isIframeSupported: 'No',
+        // isIframeSupported: 'No',
       } as any,
       children: [] as any,
     },
@@ -307,7 +307,7 @@ export const AUTH_INIT: IInitialSetup = {
       },
       additionalMeta: {
         isExternal: false,
-        //isIframeSupported: 'Yes',
+        // isIframeSupported: 'Yes',
       } as any,
       children: [] as any,
     },
@@ -347,7 +347,7 @@ export const AUTH_INIT: IInitialSetup = {
       },
       additionalMeta: {
         isExternal: false,
-        //isIframeSupported: 'Yes',
+        // isIframeSupported: 'Yes',
       } as any,
       children: [] as any,
     },
@@ -390,7 +390,7 @@ export const AUTH_INIT: IInitialSetup = {
       },
       additionalMeta: {
         isExternal: false,
-        //isIframeSupported: 'Yes',
+        // isIframeSupported: 'Yes',
       } as any,
     },
     {
@@ -430,7 +430,7 @@ export const AUTH_INIT: IInitialSetup = {
       },
       additionalMeta: {
         isExternal: false,
-        //isIframeSupported: 'Yes',
+        // isIframeSupported: 'Yes',
       } as any,
     },
     {
@@ -472,7 +472,7 @@ export const AUTH_INIT: IInitialSetup = {
       },
       additionalMeta: {
         isExternal: false,
-        //isIframeSupported: 'Yes',
+        // isIframeSupported: 'Yes',
       } as any,
     },
     {
@@ -544,7 +544,7 @@ export const AUTH_INIT: IInitialSetup = {
       } as any,
       additionalMeta: {
         isExternal: false,
-        //isIframeSupported: 'Yes',
+        // isIframeSupported: 'Yes',
       } as any,
     },
     {
@@ -586,7 +586,7 @@ export const AUTH_INIT: IInitialSetup = {
       },
       additionalMeta: {
         isExternal: false,
-        //isIframeSupported: 'Yes',
+        // isIframeSupported: 'Yes',
       } as any,
     },
     {
@@ -627,7 +627,7 @@ export const AUTH_INIT: IInitialSetup = {
       },
       additionalMeta: {
         isExternal: true,
-        //isIframeSupported: 'No',
+        // isIframeSupported: 'No',
       } as any,
     },
   ],

@@ -115,15 +115,15 @@ export class InitService {
     // Invalid User
     try {
       await this.fetchStartUpDetails() // detail: depends only on userID
-       //const result =
+      // const result =
       // if (result.status === 419) {
       //   let res = this.authSvc.logout()
       //      /* tslint:disable-next-line */
       //   console.log(res)
       // }
     } catch (e) {
-         /* tslint:disable-next-line */
-         console.log(e)
+      /* tslint:disable-next-line */
+      console.log(e)
       this.settingsSvc.initializePrefChanges(environment.production)
       this.updateNavConfig()
       this.logger.info('Not Authenticated')
@@ -350,7 +350,6 @@ export class InitService {
 
         if (userPidProfile && userPidProfile.roles && userPidProfile.roles.length > 0 &&
           this.hasRole(userPidProfile.roles)) {
-
           // if (userPidProfile.result.response.organisations.length > 0) {
           //   const organisationData = userPidProfile.result.response.organisations
           //   userRoles = (organisationData[0].roles.length > 0) ? organisationData[0].roles : []
@@ -414,21 +413,19 @@ export class InitService {
         return details
       } catch (e) {
         this.configSvc.userProfile = null
-           return e
-        throw new Error('Invalid user')
+        return e
       }
-    } else {
-      return { group: [], profileDetailsStatus: true, roles: new Set(['Public']), tncStatus: true, isActive: true }
-      // const details: IDetailsResponse = await this.http
-      //   .get<IDetailsResponse>(endpoint.details).pipe(retry(3))
-      //   .toPromise()
-      // this.configSvc.userGroups = new Set(details.group)
-      // this.configSvc.userRoles = new Set((details.roles || []).map(v => v.toLowerCase()))
-      // if (this.configSvc.userProfile && this.configSvc.userProfile.isManager) {
-      //   this.configSvc.userRoles.add('is_manager')
+    }
+    return { group: [], profileDetailsStatus: true, roles: new Set(['Public']), tncStatus: true, isActive: true }
+    // const details: IDetailsResponse = await this.http
+    //   .get<IDetailsResponse>(endpoint.details).pipe(retry(3))
+    //   .toPromise()
+    // this.configSvc.userGroups = new Set(details.group)
+    // this.configSvc.userRoles = new Set((details.roles || []).map(v => v.toLowerCase()))
+    // if (this.configSvc.userProfile && this.configSvc.userProfile.isManager) {
+    //   this.configSvc.userRoles.add('is_manager')
 
   }
-}
 
   // private async fetchUserProfileV2(): Promise<any> {
   //   // const userRoles: string[] = []

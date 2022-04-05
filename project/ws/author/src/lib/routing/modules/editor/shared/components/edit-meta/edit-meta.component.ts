@@ -1070,7 +1070,7 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
 
                   .subscribe(
                     data => {
-                      if (data && data.name !== "Error") {
+                      if (data && data.name !== 'Error') {
                         const generateURL = this.generateUrl(data.artifactUrl)
                         const updateArtf: NSApiRequest.IUpdateImageMetaRequestV2 = {
                           request: {
