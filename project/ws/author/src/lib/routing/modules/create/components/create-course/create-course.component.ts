@@ -14,7 +14,6 @@ import { AccessControlService } from '@ws/author/src/lib/modules/shared/services
 import { IprDialogComponent } from '@ws/author/src/lib/modules/shared/components/ipr-dialog/ipr-dialog.component'
 import { mergeMap } from 'rxjs/operators'
 
-
 @Component({
   // tslint:disable-next-line:component-selector
   selector: 'ws-author-create-course',
@@ -127,7 +126,7 @@ export class CreateCourseComponent implements OnInit {
     if (this.content && this.courseData.courseName) {
       this.svc
         .createV2({
-          name: this.courseData.courseName,
+          name: this.courseData,
           contentType: this.content.contentType,
           mimeType: this.content.mimeType,
           locale: this.language,
@@ -137,14 +136,14 @@ export class CreateCourseComponent implements OnInit {
         }).pipe(mergeMap((id: string) => {
           this.identifier = id
           const request = {
-            'category': {
-              'context': [
+            category: {
+              context: [
                 {
-                  'type': 'course',
-                  'identifier': id
-                }
-              ]
-            }
+                  type: 'course',
+                  identifier: id,
+                },
+              ],
+            },
           }
           return this.svc.createForum(request)
         }))

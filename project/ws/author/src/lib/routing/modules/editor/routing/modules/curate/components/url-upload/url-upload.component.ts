@@ -12,6 +12,7 @@ import { EditorContentService } from '@ws/author/src/lib/routing/modules/editor/
 import { IFormMeta } from './../../../../../../../../interface/form'
 import { AuthInitService } from './../../../../../../../../services/init.service'
 import { URLCheckerClass } from './url-upload.helper'
+import { EditorService } from '@ws/author/src/lib/routing/modules/editor/services/editor.service'
 
 @Component({
   selector: 'ws-auth-url-upload',
@@ -37,6 +38,7 @@ export class UrlUploadComponent implements OnInit {
     private contentService: EditorContentService,
     private configSvc: ConfigurationsService,
     private initService: AuthInitService,
+    private editorService: EditorService,
   ) { }
 
   ngOnInit() {
@@ -44,12 +46,19 @@ export class UrlUploadComponent implements OnInit {
     this.contentService.changeActiveCont.subscribe(data => {
       this.setIframeVal = ''
       this.currentContent = data
-      this.triggerDataChange()
+      this.editorService.checkReadAPI(data)
+        .subscribe(
+          (res: any) => {
+            if (res) {
+              this.triggerDataChange(res.result.content.isIframeSupported)
+            }
+          })
     })
   }
 
-  triggerDataChange() {
+  triggerDataChange(isIframeSupported: any) {
     const updatedMeta = this.contentService.getUpdatedMeta(this.currentContent)
+    updatedMeta['isIframeSupported'] = isIframeSupported
     if (
       !this.isCollectionEditor ||
       (this.isCollectionEditor && updatedMeta.category === 'Resource')
@@ -84,13 +93,12 @@ export class UrlUploadComponent implements OnInit {
     if (!this.urlUploadForm) {
       this.createForm()
     }
-
     // this.setIframeVal = meta.isIframeSupported || 'No'
-
     this.canUpdate = false
     this.urlUploadForm.controls.artifactUrl.setValue(meta.artifactUrl || '')
     this.urlUploadForm.controls.mimeType.setValue(meta.mimeType || 'application/html')
-    this.urlUploadForm.controls.isIframeSupported.setValue(meta.isIframeSupported || 'No')
+    // this.urlUploadForm.controls.isIframeSupported.setValue(meta.isIframeSupported || 'No')
+    this.urlUploadForm.controls.isIframeSupported.setValue(meta.isIframeSupported)
     this.urlUploadForm.controls.isInIntranet.setValue(meta.isInIntranet || false)
     this.urlUploadForm.controls.isExternal.setValue(true)
     this.urlUploadForm.controls.versionKey.setValue(meta.versionKey)
@@ -141,7 +149,6 @@ export class UrlUploadComponent implements OnInit {
   storeData() {
     const originalMeta = this.contentService.getOriginalMeta(this.currentContent)
     const currentMeta = this.urlUploadForm.value
-
     const meta: any = {}
     // if (currentMeta.artifactUrl && !this.iprAccepted) {
     //   return
@@ -158,6 +165,7 @@ export class UrlUploadComponent implements OnInit {
         ) {
           meta[v] = currentMeta[v]
           meta['versionKey'] = currentMeta['versionKey']
+          meta['isIframeSupported'] = currentMeta['mimeType'] === 'text/x-url' ? currentMeta['isIframeSupported'] : undefined
         } else {
           meta[v] = JSON.parse(
             JSON.stringify(
@@ -174,9 +182,21 @@ export class UrlUploadComponent implements OnInit {
   }
 
   isIframeSupportedClicked() {
-    if (this.urlUploadForm.controls.isIframeSupported.value === 'Yes') {
-      this.iframeSupportedClicked = true
-    }
+    this.storeData()
+    let requestBody: any
+            requestBody = {
+          request: {
+            content: {
+              isIframeSupported : this.urlUploadForm.controls.isIframeSupported.value,
+              versionKey : this.urlUploadForm.value.versionKey,
+            },
+          },
+        }
+        this.editorService.updateContentV3(requestBody, this.currentContent).subscribe((data: any) => {
+          // tslint:disable-next-line:no-console
+          console.log(data)
+        })
+
   }
 
   check() {
@@ -198,7 +218,7 @@ export class UrlUploadComponent implements OnInit {
             // this.urlUploadForm.controls.isIframeSupported.setValue(this.setIframeVal)
 
           } else {
-            this.urlUploadForm.controls.isIframeSupported.setValue('No')
+            // this.urlUploadForm.controls.isIframeSupported.setValue('No')
             this.urlUploadForm.controls.mimeType.setValue('application/html')
             // disableIframe = false
           }

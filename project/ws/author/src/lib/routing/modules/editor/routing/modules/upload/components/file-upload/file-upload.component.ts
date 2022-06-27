@@ -468,6 +468,7 @@ export class FileUploadComponent implements OnInit, OnChanges {
       if (tempUpdateContent.category === 'CourseUnit') {
         nodesModified.visibility = 'Parent'
       }
+
       requestBody = {
         request: {
           content: nodesModified[this.contentService.currentContent].metadata,
@@ -486,7 +487,7 @@ export class FileUploadComponent implements OnInit, OnChanges {
         const updateHierarchyReq: NSApiRequest.IContentUpdateV3 = {
           request: {
             data: {
-              nodesModified: {},
+              nodesModified: this.contentService.getNodeModifyData(),
               hierarchy: this.storeService.getTreeHierarchy(),
             },
           },

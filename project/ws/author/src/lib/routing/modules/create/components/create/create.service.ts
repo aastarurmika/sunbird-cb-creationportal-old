@@ -2,21 +2,21 @@ import { Injectable } from '@angular/core'
 import { ConfigurationsService } from '@ws-widget/utils/src/public-api'
 // import { AUTHORING_BASE, CONTENT_CREATE } from '@ws/author/src/lib/constants/apiEndpoints'
 import { AUTHORING_BASE } from '@ws/author/src/lib/constants/apiEndpoints'
-import { NSApiResponse } from '@ws/author/src/lib/interface//apiResponse'
+// import { NSApiResponse } from '@ws/author/src/lib/interface//apiResponse'
 import { NSApiRequest } from '@ws/author/src/lib/interface/apiRequest'
 import { AccessControlService } from '@ws/author/src/lib/modules/shared/services/access-control.service'
-import { ApiService } from '@ws/author/src/lib/modules/shared/services/api.service'
+// import { ApiService } from '@ws/author/src/lib/modules/shared/services/api.service'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { environment } from '../../../../../../../../../../src/environments/environment'
 import { HttpClient } from '@angular/common/http'
 const API_END_POINTS = {
-  CREATE_FORUM: `/apis/proxies/v8/discussion/forum/v3/create`
+  CREATE_FORUM: `/apis/proxies/v8/discussion/forum/v3/create`,
 }
 @Injectable()
 export class CreateService {
   constructor(
-    private apiService: ApiService,
+    // private apiService: ApiService,
     private configSvc: ConfigurationsService,
     private accessService: AccessControlService,
     private http: HttpClient,
@@ -51,21 +51,21 @@ export class CreateService {
         requestBody.content.accessPaths = 'client2'
       }
     }
-    return this.apiService
+    return this.http
       .post<NSApiRequest.ICreateMetaRequest>(
         // `${CONTENT_CREATE}${this.accessService.orgRootOrgAsQuery}`,
         `${AUTHORING_BASE}content/v3/create`,
         requestBody,
       )
       .pipe(
-        map((data: NSApiResponse.IContentCreateResponse) => {
+        map((data: any) => {
           return data.identifier
         }),
       )
   }
 
   createV2(meta: {
-    mimeType: string; contentType: string; locale: string, name: string,
+    mimeType: string; contentType: string; locale: string, name: any,
     primaryCategory: string, purpose?: string
   }): Observable<string> {
     let randomNumber = ''
@@ -84,8 +84,8 @@ export class CreateService {
           description: '',
           framework: environment.framework,
           mimeType: meta.mimeType,
-          name: meta.name,
-          purpose: (meta.purpose) ? meta.purpose : '',
+          name: meta.name.courseName,
+          purpose: (meta.name.courseIntroduction) ? meta.name.courseIntroduction : '',
           // organisation: [environment.organisation],
           organisation: [
             (this.configSvc.userProfile && this.configSvc.userProfile.departmentName) ? this.configSvc.userProfile.departmentName : '',
@@ -97,13 +97,13 @@ export class CreateService {
         },
       },
     }
-    return this.apiService
+    return this.http
       .post<NSApiRequest.ICreateMetaRequest>(
         `${AUTHORING_BASE}content/v3/create`,
         requestBody,
       )
       .pipe(
-        map((data: NSApiResponse.IContentCreateResponseV2) => {
+        map((data: any) => {
           return data.result.identifier
         }),
       )
@@ -112,5 +112,3 @@ export class CreateService {
     return this.http.post(API_END_POINTS.CREATE_FORUM, req)
   }
 }
-
-

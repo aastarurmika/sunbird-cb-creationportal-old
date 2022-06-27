@@ -461,6 +461,7 @@ export class MyContentComponent implements OnInit, OnDestroy {
       this.queryFilter,
       this.isAdmin,
     )
+
     const requestData = {
       locale: this.searchLanguage ? [this.searchLanguage] : ['en'],
       query: this.queryFilter,
@@ -514,6 +515,7 @@ export class MyContentComponent implements OnInit, OnDestroy {
         requestData.request.filters = { ...requestData.request.filters, [v.key]: v.value }
       })
     }
+
     if (requestData.request.filters.status.includes('Unpublished')) {
       requestData.request.filters.status = ['Retired']
     }
@@ -545,12 +547,13 @@ export class MyContentComponent implements OnInit, OnDestroy {
 
     switch (this.status) {
       case 'published':
-        if (this.accessService.hasRole(['content_creator'])) {
-          requestData.request.filters['createdBy'] = (this.configService.userProfile) ? this.configService.userProfile.userId : ''
-        } else
-          if (this.accessService.hasRole(['content_reviewer'])) {
-            requestData.request.filters['reviewerIDs'] = (this.configService.userProfile) ? [this.configService.userProfile.userId] : []
-          } else
+        // if (this.accessService.hasRole(['content_creator'])) {
+        //   requestData.request.filters['createdBy'] = (this.configService.userProfile) ? this.configService.userProfile.userId : ''
+        // }
+        // else
+        //   if (this.accessService.hasRole(['content_reviewer'])) {
+        //     requestData.request.filters['reviewerIDs'] = (this.configService.userProfile) ? [this.configService.userProfile.userId] : []
+        //   } else
 
             if (this.accessService.hasRole(['content_publisher'])) {
               requestData.request.filters['publisherIDs'] = (this.configService.userProfile) ? [this.configService.userProfile.userId] : []
@@ -562,23 +565,20 @@ export class MyContentComponent implements OnInit, OnDestroy {
         requestData.request.filters['publisherIDs'] = (this.configService.userProfile) ? [this.configService.userProfile.userId] : []
         break
       case 'processing':
-        if (this.accessService.hasRole(['content_creator'])) {
+        if (this.accessService.hasRole(['content_publisher'])) {
+          requestData.request.filters['publisherIDs'] = (this.configService.userProfile) ? [this.configService.userProfile.userId] : []
+        } else if (this.accessService.hasRole(['content_creator'])) {
           requestData.request.filters['createdBy'] = (this.configService.userProfile) ? this.configService.userProfile.userId : ''
         } else if (this.accessService.hasRole(['content_reviewer'])) {
           requestData.request.filters['reviewerIDs'] = (this.configService.userProfile) ? [this.configService.userProfile.userId] : []
-        } else if (this.accessService.hasRole(['content_publisher'])) {
-          requestData.request.filters['publisherIDs'] = (this.configService.userProfile) ? [this.configService.userProfile.userId] : []
         }
+        // else if (this.accessService.hasRole(['content_publisher'])) {
+        //   requestData.request.filters['publisherIDs'] = (this.configService.userProfile) ? [this.configService.userProfile.userId] : []
+        // }
         break
       case 'reviewed':
         requestData.request.filters['reviewStatus'] = 'Reviewed'
-        if (this.accessService.hasRole(['content_creator'])) {
-          requestData.request.filters['createdBy'] = (this.configService.userProfile) ? this.configService.userProfile.userId : ''
-        } else
-          if (this.accessService.hasRole(['content_reviewer'])) {
-            requestData.request.filters['reviewerIDs'] = (this.configService.userProfile) ? [this.configService.userProfile.userId] : []
-          } else
-            if (this.accessService.hasRole(['content_publisher'])) {
+        if (this.accessService.hasRole(['content_publisher'])) {
               requestData.request.filters['publisherIDs'] = (this.configService.userProfile) ? [this.configService.userProfile.userId] : []
             }
         break
@@ -612,6 +612,7 @@ export class MyContentComponent implements OnInit, OnDestroy {
     }
 
     this.loadService.changeLoad.next(true)
+
     const observable =
       this.status === 'expiry' || this.newDesign
         ? this.myContSvc.fetchFromSearchV6(searchV6Data, this.isAdmin).pipe(

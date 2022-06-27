@@ -28,7 +28,7 @@ import { NotificationComponent } from '@ws/author/src/lib/modules/shared/compone
 import { EditorContentService } from '@ws/author/src/lib/routing/modules/editor/services/editor-content.service'
 import { EditorService } from '@ws/author/src/lib/routing/modules/editor/services/editor.service'
 import { Observable, of, Subscription } from 'rxjs'
-import { InterestService } from '../../../../../../../../../app/src/lib/routes/profile/routes/interest/services/interest.service'
+// import { InterestService } from '../../../../../../../../../app/src/lib/routes/profile/routes/interest/services/interest.service'
 import { UploadService } from '../../services/upload.service'
 import { CatalogSelectComponent } from '../catalog-select/catalog-select.component'
 import { IFormMeta } from './../../../../../../interface/form'
@@ -40,16 +40,17 @@ import {
   debounceTime,
   distinctUntilChanged,
   filter,
-  startWith,
+  // startWith,
   switchMap,
   map,
 } from 'rxjs/operators'
 
 import { NSApiRequest } from '../../../../../../interface/apiRequest'
 
-import { ApiService } from '@ws/author/src/lib/modules/shared/services/api.service'
-import { NSApiResponse } from '../../../../../../interface/apiResponse'
+// import { ApiService } from '@ws/author/src/lib/modules/shared/services/api.service'
+// import { NSApiResponse } from '../../../../../../interface/apiResponse'
 import { environment } from '../../../../../../../../../../../src/environments/environment'
+import { HttpClient } from '@angular/common/http'
 @Component({
   selector: 'ws-auth-edit-meta',
   templateUrl: './edit-meta.component.html',
@@ -106,6 +107,8 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
   complexityLevelList: string[] = []
   isEditEnabled = false
   public sideNavBarOpened = false
+  gatingEnabled!: FormControl
+  issueCertification!: FormControl
 
   @ViewChild('creatorContactsView', { static: false }) creatorContactsView!: ElementRef
   @ViewChild('trackContactsView', { static: false }) trackContactsView!: ElementRef
@@ -132,11 +135,12 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
     private contentService: EditorContentService,
     private configSvc: ConfigurationsService,
     private ref: ChangeDetectorRef,
-    private interestSvc: InterestService,
+    // private interestSvc: InterestService,
     private loader: LoaderService,
     private authInitService: AuthInitService,
     private accessService: AccessControlService,
-    private apiService: ApiService,
+    // private apiService: ApiService,
+    private http: HttpClient
   ) { }
 
   ngAfterViewInit() {
@@ -310,12 +314,12 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
       this.content = this.contentService.getUpdatedMeta(data)
     })
 
-    this.filteredOptions$ = this.keywordsCtrl.valueChanges.pipe(
-      startWith(this.keywordsCtrl.value),
-      debounceTime(500),
-      distinctUntilChanged(),
-      switchMap(value => this.interestSvc.fetchAutocompleteInterestsV2(value)),
-    )
+    // this.filteredOptions$ = this.keywordsCtrl.valueChanges.pipe(
+    //   startWith(this.keywordsCtrl.value),
+    //   debounceTime(500),
+    //   distinctUntilChanged(),
+    //   switchMap(value => this.interestSvc.fetchAutocompleteInterestsV2(value)),
+    // )
   }
 
   optionSelected(keyword: string) {
@@ -340,11 +344,11 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private set content(contentMeta: NSContent.IContentMeta) {
-
     const isCreator = (this.configSvc.userProfile && this.configSvc.userProfile.userId === contentMeta.createdBy)
       ? true : false
 
     this.contentMeta = contentMeta
+
     const isEditable = this.contentService.hasAccess(
       contentMeta,
       false,
@@ -375,6 +379,8 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
           ? <any>this.convertToISODate(contentMeta.expiryDate)
           : ''
     }
+      this.contentService.currentContentData = this.contentMeta
+      this.contentService.currentContentID = this.contentMeta.identifier
 
     this.assignFields()
     this.setDuration(contentMeta.duration || '0')
@@ -479,6 +485,7 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
             )
           }
         }
+        this.contentForm.controls.sourceName.setValue(this.contentMeta.sourceName)
         if (this.isSubmitPressed) {
           this.contentForm.controls[v].markAsDirty()
           this.contentForm.controls[v].markAsTouched()
@@ -570,7 +577,6 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
       if (originalMeta && this.isEditEnabled) {
         const expiryDate = this.contentForm.value.expiryDate
         const currentMeta: NSContent.IContentMeta = JSON.parse(JSON.stringify(this.contentForm.value))
-
         const exemptArray = ['application/quiz', 'application/x-mpegURL', 'audio/mpeg', 'video/mp4',
           'application/vnd.ekstep.html-archive', 'application/json']
         if (exemptArray.includes(originalMeta.mimeType)) {
@@ -642,12 +648,10 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
             JSON.stringify(currentMeta[v as keyof NSContent.IContentMeta]) !==
             JSON.stringify(originalMeta[v as keyof NSContent.IContentMeta]) && v !== 'jobProfile'
           ) {
-
             if (
               currentMeta[v as keyof NSContent.IContentMeta] ||
-              (this.authInitService.authConfig[v as keyof IFormMeta].type === 'boolean' &&
-                currentMeta[v as keyof NSContent.IContentMeta] === false)
-            ) {
+              // (this.authInitService.authConfig[v as keyof IFormMeta].type === 'boolean' &&
+              currentMeta[v as keyof NSContent.IContentMeta] === false) {
               meta[v as keyof NSContent.IContentMeta] = currentMeta[v as keyof NSContent.IContentMeta]
             } else {
               meta[v as keyof NSContent.IContentMeta] = JSON.parse(
@@ -697,15 +701,14 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
       }
       // this.contentService.parentContent
     }
-
   }
   // emitSaveData(flag: boolean) {
   //   if (flag) {
-  //     this.saveParent = 1
-  //     if (this.saveParent === 1) {
+  //     //this.saveParent = 1
+  //     //if (this.saveParent === 1) {
   //       this.data.emit('save')
-  //     }
-  //     this.saveParent = 2
+  //     //}
+  //     //this.saveParent = 2
   //   }
   // }
 
@@ -1047,13 +1050,13 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
             },
           }
 
-          this.apiService
+          this.http
             .post<NSApiRequest.ICreateMetaRequest>(
               `${AUTHORING_BASE}content/v3/create`,
               requestBody,
             )
             .subscribe(
-              (meta: NSApiResponse.IContentCreateResponseV2) => {
+              (meta: any) => {
                 // return data.result.identifier
                 this.uploadService
                   .upload(formdata, {
@@ -1063,45 +1066,53 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
 
                   .subscribe(
                     data => {
-                      if (data) {
-                        const generateURL = this.generateUrl(data.artifactUrl)
-                        const updateArtf: NSApiRequest.IUpdateImageMetaRequestV2 = {
-                          request: {
-                            content: {
-                              // content_url: data.result.artifactUrl,
-                              // identifier: data.result.identifier,
-                              // node_id: data.result.node_id,
-                              thumbnail: generateURL,
-                              appIcon: generateURL,
-                              artifactUrl: generateURL,
-                              versionKey: (new Date()).getTime().toString(),
-                            },
-                          },
-                        }
-                        this.apiService
-                          .patch<NSApiRequest.ICreateMetaRequest>(
-                            `${AUTHORING_BASE}content/v3/update/${data.identifier}`,
-                            updateArtf,
-                          )
-                          .subscribe(
-                            (meta1: NSApiResponse.IContentCreateResponseV2) => {
-                              if (meta1) {
-                              }
-                              this.loader.changeLoad.next(false)
-                              this.canUpdate = false
-                              this.contentForm.controls.appIcon.setValue(this.generateUrl(data.artifactUrl))
-                              this.contentForm.controls.thumbnail.setValue(this.generateUrl(data.artifactUrl))
-                              this.canUpdate = true
-                              this.storeData()
-                              // this.contentForm.controls.posterImage.setValue(data.artifactURL)
+                      if (data && data.name !== 'Error') {
+                        // const generateURL = this.generateUrl(data.artifactUrl)
+                        // const updateArtf: NSApiRequest.IUpdateImageMetaRequestV2 = {
+                        //   request: {
+                        //     content: {
+                        //       // content_url: data.result.artifactUrl,
+                        //       // identifier: data.result.identifier,
+                        //       // node_id: data.result.node_id,
+                        //       thumbnail: generateURL,
+                        //       appIcon: generateURL,
+                        //       artifactUrl: generateURL,
+                        //       // versionKey: (new Date()).getTime().toString(),
+                        //       versionKey: meta.result.versionKey,
+                        //     },
+                        //   },
+                        // }
 
-                              this.snackBar.openFromComponent(NotificationComponent, {
-                                data: {
-                                  type: Notify.UPLOAD_SUCCESS,
-                                },
-                                duration: NOTIFICATION_TIME * 1000,
-                              })
-                            })
+                        // this.apiService
+                        //   .patch<NSApiRequest.ICreateMetaRequest>(
+                        //     `${AUTHORING_BASE}content/v3/update/${data.identifier}`,
+                        //     updateArtf,
+                        //   )
+                        // this.editorService.checkReadAPI(data.identifier)
+                        // .subscribe(
+                        //   (res: any) => {
+                        //     console.log(res)
+                        //     if (res) {
+                        //     }
+                        this.loader.changeLoad.next(false)
+                        this.canUpdate = false
+                        this.contentForm.controls.appIcon.setValue(this.generateUrl(data.artifactUrl))
+                        this.contentForm.controls.thumbnail.setValue(this.generateUrl(data.artifactUrl))
+                        this.canUpdate = true
+                        // this.data.emit('save')
+                        this.storeData()
+                        this.authInitService.uploadData('thumbnail')
+                        // this.contentForm.controls.posterImage.setValue(data.artifactURL)
+                        this.snackBar.openFromComponent(NotificationComponent, {
+                          data: {
+                            type: Notify.UPLOAD_SUCCESS,
+                          },
+                          duration: NOTIFICATION_TIME * 2000,
+                        })
+                        // })
+                      } else {
+                        this.loader.changeLoad.next(false)
+                        this.snackBar.open(data.message, undefined, { duration: 2000 })
                       }
                     },
                     () => {
@@ -1434,6 +1445,8 @@ export class EditMetaComponent implements OnInit, OnDestroy, AfterViewInit {
       name: [],
       nodeType: [],
       org: [],
+      gatingEnabled: true,
+      issueCertification: false,
       creatorDetails: [],
       // passPercentage: [],
       plagScan: [],

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { LoggerService } from '@ws-widget/utils'
+import { LoggerService, ConfigurationsService } from '@ws-widget/utils'
 import { DEPTH_RUE } from '@ws/author/src/lib/constants/depth-rule'
 import { IAllowedType } from '@ws/author/src/lib/interface/collection-child-config'
 import { NSContent } from '@ws/author/src/lib/interface/content'
@@ -12,6 +12,10 @@ import { BehaviorSubject, ReplaySubject } from 'rxjs'
 import { IContentNode, IContentTreeNode } from './../interface/icontent-tree'
 import { CollectionResolverService } from './resolver.service'
 import { NSApiRequest } from '@ws/author/src/lib/interface/apiRequest'
+import { Router } from '@angular/router'
+// import { v4 as uuidv4 } from 'uuid'
+import { AccessControlService } from '@ws/author/src/lib/modules/shared/services/access-control.service'
+import { environment } from '../../../../../../../../../../../../src/environments/environment'
 
 interface IProcessedError {
   id: string | number
@@ -22,7 +26,7 @@ interface IProcessedError {
 export class CollectionStoreService {
   parentNode: string[] = []
   invalidIds: number[] = []
-
+  createdModuleUpdate = false
   onInvalidNodeChange = new ReplaySubject<number[]>()
   /**
    * Map from flat node to nested node. This helps us finding the nested node to be modified
@@ -52,6 +56,9 @@ export class CollectionStoreService {
     private resolver: CollectionResolverService,
     private authInitService: AuthInitService,
     private logger: LoggerService,
+    private router: Router,
+    private accessService: AccessControlService,
+    private configSvc: ConfigurationsService,
   ) { }
 
   treeStructureChange = new BehaviorSubject<IContentNode | null>(null)
@@ -159,21 +166,24 @@ export class CollectionStoreService {
   //   }
   // }
 
-  dragAndDrop(
+  async dragAndDrop(
     dragNode: IContentTreeNode | IContentNode,
     dropNode: IContentTreeNode,
     adjacentId?: number,
     dropLocation: 'above' | 'below' = 'below',
     emitChange = true,
   ) {
+
     const oldParentNode = dragNode.parentId ? this.flatNodeMap.get(dragNode.parentId) : undefined
     const newParentNode = this.flatNodeMap.get(dropNode.id) as IContentNode
     const oldParentChildList = oldParentNode ? (oldParentNode.children as IContentNode[]) : []
     const newParentChildList = newParentNode.children as IContentNode[]
+    let request: any
     oldParentChildList.splice(
       oldParentChildList.findIndex(v => v.id === dragNode.id),
       1,
     )
+
     const childNode = this.flatNodeMap.get(dragNode.id) as IContentNode
     childNode.parentId = dropNode.id
     if (adjacentId) {
@@ -239,6 +249,18 @@ export class CollectionStoreService {
           }
         }
       })
+      request = {
+        request: {
+          rootId: this.parentNode[0],
+          unitId: dropNode.identifier,
+          children: [this.editorService.resourseID],
+        },
+      }
+      if (this.parentNode[0] !== dropNode.identifier) {
+        const result = await this.editorService.resourceToModule(request).toPromise()
+        // tslint:disable-next-line:no-console
+        console.log(result)
+      }
     }
     if (this.parentNode.length > 0) {
       this.parentNode.forEach(element => {
@@ -250,6 +272,7 @@ export class CollectionStoreService {
               childrenArray.push(childData.identifier)
             })
           }
+
           this.changedHierarchy[element] = {
             root: this.parentNode.includes(element),
             contentType: tempData.contentType,
@@ -258,7 +281,6 @@ export class CollectionStoreService {
         }
       })
     }
-
     if (emitChange) {
       this.treeStructureChange.next(this.treeStructureChange.value)
     }
@@ -345,7 +367,7 @@ export class CollectionStoreService {
 
       const meta = this.authInitService.creationEntity.get(cType) as ICreateEntity
       const parentData = this.contentService.parentUpdatedMeta()
-
+      let content
       // Temporary Static Value
       let mimeTypeData = meta.mimeType
       // if (cType.toLowerCase() === 'assessment') {
@@ -395,24 +417,50 @@ export class CollectionStoreService {
 
       // const content = await this.editorService.createAndReadContent(requestBody).toPromise()
 
-      const content = await this.editorService.createAndReadContentV2(requestBody).toPromise()
+      if (meta.primaryCategory === 'Course Unit') {
+        content = await this.editorService.createAndReadModule(this.getModuleRequest(requestBody),
+          parentData.identifier).toPromise()
+        this.createdModuleUpdate = true
+      } else {
+        content = await this.editorService.createAndReadContentV2(requestBody).toPromise()
+             await this.contentService.setOriginalMeta(content)
+      //console.log(data)
+      //if(data) {
+          const requestBodyV2: NSApiRequest.IContentUpdateV3 = {
+      request: {
+        data: {
+          nodesModified: this.contentService.getNodeModifyData(),
+          hierarchy: this.getTreeHierarchy(),
+        },
+      },
+    }
+
+            await this.editorService.updateContentV4(requestBodyV2).subscribe(() => {
+             this.editorService.readcontentV3(this.contentService.parentContent).subscribe((data: any) => {
+              this.contentService.resetOriginalMetaWithHierarchy(data)
+              // tslint:disable-next-line: align
+            })
+            })
+          //}
+      }
+
       // if (content) {
       //  // content.thumbnail = parentData.thumbnail
       //  // content.appIcon = parentData.appIcon
       // }
+      if (content) {
+        this.contentService.setOriginalMeta(content)
 
-      this.contentService.setOriginalMeta(content)
-
-      const contentDataMap = new Map<string, NSContent.IContentMeta>()
-      const treeStructure = this.resolver.buildTreeAndMap(
-        content,
-        contentDataMap,
-        this.flatNodeMap,
-        this.uniqueIdMap,
-        this.lexIdMap,
-      )
-      this.dragAndDrop(treeStructure, dropNode, adjacentId, dropLocation)
-
+        const contentDataMap = new Map<string, NSContent.IContentMeta>()
+        const treeStructure = this.resolver.buildTreeAndMap(
+          content,
+          contentDataMap,
+          this.flatNodeMap,
+          this.uniqueIdMap,
+          this.lexIdMap,
+        )
+        this.dragAndDrop(treeStructure, dropNode, adjacentId, dropLocation)
+      }
       if (newChildUpdateCall) {
         // this.getHierarchyTreeStructure()
       }
@@ -426,6 +474,120 @@ export class CollectionStoreService {
       this.logger.error(ex)
       return false
     }
+  }
+
+  getModuleRequest(meta: any) {
+    const parentData = this.contentService.getOriginalMeta(this.contentService.parentContent)
+    const nodesModify: any = {}
+    // const uuidValue = uuidv4()
+    let randomNumber = ''
+    // tslint:disable-next-line: no-increment-decrement
+    for (let i = 0; i < 16; i++) {
+      randomNumber += Math.floor(Math.random() * 10)
+    }
+    if (parentData && parentData.children && parentData.children.length > 0) {
+      nodesModify[parentData.identifier] = {
+        // objectType: 'Content',
+        // contentType: 'Course',
+        isNew: false,
+        root: true,
+      }
+      parentData.children.forEach((element: any) => {
+        if (element.primaryCategory === 'Course Unit') {
+          nodesModify[element.identifier] = {
+            isNew: false,
+            root: (element.identifier === parentData.identifier) ? true : false,
+          }
+        }
+        if (element.children && element.children.length > 0) {
+          parentData.children.forEach((subEle: any) => {
+            if (subEle.primaryCategory === 'Course Unit') {
+              nodesModify[subEle.identifier] = {
+                isNew: false,
+                root: (subEle.identifier === parentData.identifier) ? true : false,
+              }
+            }
+          })
+        }
+      })
+    } else {
+      nodesModify[parentData.identifier] = {
+        // objectType: 'Content',
+        // contentType: 'Course',
+        isNew: false,
+        root: true,
+      }
+    }
+    nodesModify[meta.name] = {
+      isNew: true,
+      root: false,
+      metadata: {
+        code: randomNumber,
+        contentType: meta.contentType,
+        createdBy: this.accessService.userId,
+        createdFor: [(this.configSvc.userProfile && this.configSvc.userProfile.rootOrgId) ? this.configSvc.userProfile.rootOrgId : ''],
+        creator: this.accessService.userName,
+        description: meta.description,
+        framework: environment.framework,
+        mimeType: meta.mimeType,
+        name: meta.name,
+        organisation: [
+          (this.configSvc.userProfile && this.configSvc.userProfile.departmentName) ? this.configSvc.userProfile.departmentName : '',
+        ],
+        isExternal: meta.mimeType === 'application/html',
+        primaryCategory: meta.primaryCategory,
+        license: (meta.license) ? meta.license : 'CC BY 4.0',
+        ownershipType: ['createdFor'],
+        // purpose: (purpose) ? purpose : '',
+        purpose: '',
+        // visibility: (meta.primaryCategory === 'Course Unit') ? 'Parent' : 'Default',
+      },
+    }
+    const hierarchyData = this.getTreeHierarchy()
+    hierarchyData[meta.name] = {
+      root: false,
+      contentType: meta.contentType,
+      primaryCategory: meta.primaryCategory,
+      children: [],
+    }
+    Object.keys(hierarchyData).forEach((ele: any) => {
+      if (hierarchyData[ele].root) {
+        hierarchyData[ele].children.push(meta.name)
+      }
+    })
+
+    parentData.children.forEach((element: any) => {
+      // if (element.primaryCategory === 'Course Unit') {
+      hierarchyData[element.identifier] = {
+        // isNew: false,
+        children: [],
+        name: element.name,
+        root: (element.identifier === parentData.identifier) ? true : false,
+      }
+      // }
+      if (element.children && element.children.length > 0) {
+        parentData.children.forEach((subEle: any) => {
+          // if (subEle.primaryCategory === 'Course Unit') {
+          hierarchyData[subEle.identifier] = {
+            // isNew: false,
+            children: [],
+            name: subEle.name,
+            root: (subEle.identifier === parentData.identifier) ? true : false,
+          }
+          // }
+        })
+      }
+    })
+
+    const modulePayload = {
+      request: {
+        data: {
+          nodesModified: nodesModify,
+          hierarchy: hierarchyData,
+        },
+      },
+    }
+    return modulePayload
   }
 
   getHierarchyTreeStructure() {
@@ -479,7 +641,6 @@ export class CollectionStoreService {
       // hierarchyOb[this.contentService.currentContent]['children'] = childArr
       hierarchyOb[this.contentService.currentContent]['root'] = true
     }
-
     const requestBodyV2: NSApiRequest.IContentUpdateV3 = {
       request: {
         data: {
@@ -683,7 +844,10 @@ export class CollectionStoreService {
         }
         children.forEach((child: IContentNode, position: number) => {
           const childContent = this.contentService.getUpdatedMeta(child.identifier)
+          /* tslint:disable-next-line */
+          console.log(content)
           let canPresent = false
+
           allowedTypes.forEach((element: IAllowedType, index: number) => {
             const canAllow = this.contentService.checkConditionV2(childContent, element.conditions)
             if (canAllow) {
@@ -714,13 +878,21 @@ export class CollectionStoreService {
           }
         })
         allowedTypes.forEach((type: IAllowedType, index: number) => {
-          if (type.minimum && childTypeMap[index] < type.minimum) {
-            errorMsg.push(
-              `Minimum ${type.minimum} contents of type ${this.formStringFromCondition(
-                type.conditions,
-              )} is required. But only ${childTypeMap[index]} is present`,
-            )
-          }
+          const url = this.router.url
+          const id = url.split('/')
+          let contentData: any
+          this.editorService.readcontentV3(id[3]).subscribe((res: any) => {
+            contentData = res
+            if (contentData.status === 'Draft') {
+              if (type.minimum && childTypeMap[index] < type.minimum) {
+                errorMsg.push(
+                  `Minimum ${type.minimum} contents of type ${this.formStringFromCondition(
+                    type.conditions,
+                  )} is required. But only ${childTypeMap[index]} is present`,
+                )
+              }
+            }
+          })
           if (type.maximum && type.maximum < childTypeMap[index]) {
             errorMsg.push(
               `Maximum ${type.maximum} contents of type ${this.formStringFromCondition(
@@ -754,34 +926,42 @@ export class CollectionStoreService {
       const errorMsg: string[] = []
       const lexId = this.uniqueIdMap.get(v) as string
       const content = this.contentService.getUpdatedMeta(lexId)
+      // tslint:disable-next-line:no-console
+      console.log(content)
+      // const url = this.router.url
+      // const id = url.split('/')
       if (content.name === '') {
-         errorMsg.push('Course title cannot be empty')
+        errorMsg.push('Course title cannot be empty')
       }
-       if (content.description === '') {
+      if (content.description === '' && content.status === 'Draft') {
         errorMsg.push('Course description/summary cannot be empty')
       }
-       if (content.purpose === '') {
+      if (content.purpose === '') {
         errorMsg.push('Course subtitle cannot be empty')
       }
-       if (content.instructions === '') {
+      if (content.instructions === '') {
         errorMsg.push('Course long description cannot be empty')
       }
-      if (content.thumbnail === '') {
+      /*Workaround*/
+      // && content.parent != id[3]
+      if (content.thumbnail === undefined && content.status === 'Draft') {
         errorMsg.push('Course thumbnail cannot be empty')
       }
-      if (content.sourceName && content.sourceName === 'My Learning World') {
+      if (content.sourceName === undefined && content.status === 'Draft' && content.parent !== undefined) {
         errorMsg.push('Course provider/source cannot be empty')
       }
       if (content.mimeType === 'text/x-url' && content.artifactUrl === '') {
         errorMsg.push('Course artifactUrl cannot be empty')
       }
-      if (content.mimeType === 'text/x-url' && !(/(http(s?)):\/\//i.test(content.artifactUrl))) {
-        errorMsg.push('Course artifactUrl entered is not valid')
-      }
-       if (content.publisherDetails && content.publisherDetails.length === 0 && content.parent === undefined) {
+      // if (content.mimeType === 'text/x-url' && !(/(http(s?)):\/\//i.test(content.artifactUrl))) {
+      // if (content.mimeType === 'text/x-url') {
+      //   errorMsg.push('Course artifactUrl entered is not valid')
+      // }
+      // tslint:disable-next-line:max-line-length
+      if (content.publisherDetails && content.publisherDetails.length === 0 && content.parent === undefined && content.contentType === "Course") {
         errorMsg.push('Course publisher details cannot be empty')
       }
-       if (content.trackContacts && content.trackContacts.length === 0 && content.parent === undefined) {
+      if (content.trackContacts && content.trackContacts.length === 0 && content.parent === undefined && content.contentType === "Course") {
         errorMsg.push('Course reviewer details cannot be empty')
       }
 
@@ -828,12 +1008,22 @@ export class CollectionStoreService {
   }
 
   getTreeHierarchy() {
+    this.hierarchyTree = {}
     const newParentNode = this.flatNodeMap.get(this.currentParentNode) as IContentNode
     this.hierarchyTree[newParentNode.identifier] = {
       root: this.parentNode.includes(newParentNode.identifier),
       contentType: newParentNode.category,
       children: (newParentNode.children) ? newParentNode.children.map(v => {
         const child = v.identifier
+        if (v.primaryCategory) {
+          this.hierarchyTree[v.identifier] = {
+            root: false,
+            contentType: v.contentType === 'Resource' ? undefined : 'CourseUnit',
+            primaryCategory: v.primaryCategory === 'Resource' ? undefined : 'Course Unit',
+            name: v.name,
+            children: [],
+          }
+        }
         return child
       }) : [],
     }
@@ -843,12 +1033,45 @@ export class CollectionStoreService {
           this.hierarchyTree[element.identifier] = {
             root: this.parentNode.includes(element.identifier),
             // contentType: element.contentType,
-            contentType: element.category,
+            primaryCategory: element.primaryCategory === "Collection" ? "Course Unit" : undefined,
+            contentType: element.contentType === "Collection" ? "CourseUnit" : undefined,
             children: element.children.map(v => {
+
               const child = v.identifier
+              if (v.category) {
+                this.hierarchyTree[v.identifier] = {
+                  root: false,
+                  contentType: v.contentType === 'Resource' ? undefined : 'CourseUnit',
+                  primaryCategory: v.primaryCategory === 'Resource' ? undefined : 'Course Unit',
+                  name: v.name,
+                  children: [],
+                }
+              }
               return child
             }),
           }
+          element.children.forEach(subElement => {
+            if (subElement.children && subElement.children.length > 0) {
+              this.hierarchyTree[subElement.identifier] = {
+                root: this.parentNode.includes(subElement.identifier),
+                contentType: subElement.contentType === "Collection" ? "CourseUnit" : undefined,
+                primaryCategory: subElement.primaryCategory === "Collection" ? "Course Unit" : undefined,
+                children: subElement.children.map(v => {
+                  const child = v.identifier
+                  if (v.primaryCategory) {
+                    this.hierarchyTree[v.identifier] = {
+                      root: false,
+                      contentType: v.contentType === 'Resource' ? undefined : 'CourseUnit',
+                      primaryCategory: v.primaryCategory === 'Resource' ? undefined : 'Course Unit',
+                      name: v.name,
+                      children: [],
+                    }
+                  }
+                  return child
+                }),
+              }
+            }
+          })
         }
       })
     }
